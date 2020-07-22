@@ -24,7 +24,7 @@ def data_load():
 def model(covid_esp_diff3,flights_esp,x):
     model4 = SARIMAX(covid_esp_diff3[3:-12], order=(4, 0, 4),exog=flights_esp[2:])
     results_SARIMAX = model4.fit()
-    prediction= results_SARIMAX.get_forecast(steps=1,exog=[x])
+    prediction= results_SARIMAX.get_forecast(steps=len(x),exog=x)
     return prediction.predicted_mean
     
 
@@ -33,9 +33,13 @@ data_load_state = st.text('Loading data...')
 # Load 10,000 rows of data into the dataframe.
 covid_esp_diff3, flights_esp = data_load()
 # Notify the reader that the data was successfully loaded.
-data_load_state.text('Loading data...done!')
+data_load_state.text('Choose the number of flights for the next 3 days')
 #creamos el modelo
-x = st.slider('number of flights', 0, 1000, 600)
+x1 = st.slider('number of flights day1', 0, 1000, 600)
+x2 = st.slider('number of flights day2', 0, 1000, 600)
+x3 = st.slider('number of flights day3', 0, 1000, 600)
+x = [x1,x2,x3]
 predictions=model(covid_esp_diff3,flights_esp,x)
 #enseñar predicciones
 st.write(predictions)
+st.line_chart(covid_esp_diff3)

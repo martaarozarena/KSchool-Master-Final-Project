@@ -28,18 +28,28 @@ def model(covid_esp_diff3,flights_esp,x):
     return prediction.predicted_mean
     
 
-# Create a text element and let the reader know the data is loading.
+# Create a title, a subheader and let the reader know the data is loading.
+st.title("Coronavirus forecast")
+st.subheader("This is an app to help visualizing the coronavirus cases forecasting")
 data_load_state = st.text('Loading data...')
-# Load 10,000 rows of data into the dataframe.
+
+# Load coronavirus cases data and flights data.
 covid_esp_diff3, flights_esp = data_load()
-# Notify the reader that the data was successfully loaded.
-data_load_state.text('Choose the number of flights for the next 3 days')
-#creamos el modelo
-x1 = st.slider('number of flights day1', 0, 1000, 600)
-x2 = st.slider('number of flights day2', 0, 1000, 600)
-x3 = st.slider('number of flights day3', 0, 1000, 600)
-x = [x1,x2,x3]
+
+# Notify the reader what to do when data is loaded.
+data_load_state.text('Data loaded')
+
+#select number of days to forecast and create the slider buttons
+days=st.radio("choose the number of days to forecast:",("1","2","3","4"))
+i=1
+x=[]
+for i in range(int(days)):
+    x1 = st.slider(f'number of flights day '+str(i), 0, 1000, 600)
+    i=i+1
+    x.append(x1)
 predictions=model(covid_esp_diff3,flights_esp,x)
+
 #enseñar predicciones
+st.text("Predicted values for the next "+str(days)+" days")
 st.write(predictions)
-st.line_chart(covid_esp_diff3)
+st.line_chart(covid_esp_diff3[3:-12].append(predictions))

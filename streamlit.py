@@ -6,7 +6,9 @@ from statsmodels.tsa.statespace.sarimax import SARIMAX
 @st.cache
 def data_load():
     
-    covid = pd.read_csv("./data/owid-covid-data 20200713.csv", parse_dates=["date"])  
+    url = "https://drive.google.com/file/d/1Mm8oluT401FkocpFvinr852FMPNsQMm1/view?usp=sharing"
+    path = 'https://drive.google.com/uc?export=download&id='+url.split('/')[-2]
+    covid = pd.read_csv(path, parse_dates=["date"])
     covid_eur = covid[covid['continent']=='Europe']
     covid_eur['new_cases'] = covid_eur['new_cases'].fillna(0)
     covid_esp = covid_eur[covid_eur["location"]=="Spain"].reset_index()
@@ -16,10 +18,13 @@ def data_load():
     covid_esp["MA3"] = covid_esp.new_cases.rolling(3).mean()
     covid_esp_ma3 = covid_esp["MA3"]
     covid_esp_diff3 = covid_esp_newcases - covid_esp_ma3
-    flights_esp = pd.read_csv("./data/vuelos_esp.csv",parse_dates=["FLT_DATE"],index_col="FLT_DATE")
+    url2 = "https://drive.google.com/file/d/1V19t2WshmMUonqZFfWAAF9X2siHiwmv2/view?usp=sharing"
+    path2 = 'https://drive.google.com/uc?export=download&id='+url2.split('/')[-2]
+    flights_esp = pd.read_csv(path2,parse_dates=["FLT_DATE"],index_col="FLT_DATE")
     flights_esp_arr = flights_esp["FLT_ARR_1"]
     flights_esp_arr = flights_esp_arr.resample("1D").sum()
     return covid_esp_diff3,flights_esp_arr
+
 
 #@st.cache
 def model(covid,arrflights,x):

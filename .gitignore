@@ -3,4 +3,5 @@ data/
 *.docx
 *.pptx
 *.csv
+*.xlsx
 *.pkl

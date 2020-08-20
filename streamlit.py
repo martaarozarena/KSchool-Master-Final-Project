@@ -6,18 +6,15 @@ import joblib
 import urllib.request
     
 varc1=[1]
-# Create a title, a subheader and let the reader know the data is loading.
+exogenas=pd.read_csv("/home/dsc/proyecto/data/exogenas.csv")
+
+# Create a title, a subheader.
 st.title("Coronavirus forecast")
 st.subheader("This is an app for predicting new number of coronavirus cases during a week")
 
-#select number of days to forecast and create the slider buttons
-days=7
-x=[]
-for i in range(1,int(days)+1):
-    x1 = st.slider(f'Number of arrival flights day '+str(i), 0, 1000, 600)
-    x.append(x1)
-flightpredictions = np.reshape(x, (-1,1))
+#chooose a country to predict the cases
 
+country = st.selectbox("What's your favorite movie genre", ("Denmark","Germany","Spain","Finland","Italy","Sweden","France","Norway","United Kingdom","United States","Canada","Mexico","Australia","Indonesia","Malaysia","Philippines","Thailand","Hong Kong","Vietnam","China","India","Japan","Singapore","Taiwan","Saudi Arabia","United Arab Emirates"))
 
 #select the values of the 2 diferent variables
 st.subheader("testing policy")
@@ -32,10 +29,12 @@ st.text("0 - no contact tracing\n1 - limited contact tracing; not done for all c
 tracing = st.slider('choose the contact tracing policy applied next week:', 0, 3, 1)
 tracingpolicy=pd.Series(7*[testing])
 
+#Parar probar
+
 #Load model and make the predictions
 
 model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1NeoAEr1Ksa_6Mwu1mNABZqoQlrlmvdrd"))
-results=model.get_forecast(steps=7,exog=flightpredictions)
+results=model.get_forecast(steps=7,exog=testingpolicy)
 st.title("Forecast for next week")
 st.dataframe(results.predicted_mean)
 st.line_chart(results.predicted_mean)

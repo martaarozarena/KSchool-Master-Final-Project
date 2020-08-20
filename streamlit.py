@@ -4,13 +4,14 @@ import numpy as np
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import joblib
 import urllib.request
+from datetime import datetime, timedelta, date
     
 varc1=[1]
-exogenas=pd.read_csv("/home/dsc/proyecto/data/exogenas.csv")
+exogenas=pd.read_csv("/home/dsc/proyecto/data/exogenas.csv", parse_dates=[0], index_col=[0])
 
 # Create a title, a subheader.
 st.title("Coronavirus forecast")
-st.subheader("This is an app for predicting new number of coronavirus cases during a week")
+st.subheader("This is an app for predicting new number of coronavirus cases during two weeks")
 
 #chooose a country to predict the cases
 
@@ -21,16 +22,32 @@ st.subheader("testing policy")
 st.text("0 - no testing policy\n1 - only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers)\n2 - testing of anyone showing Covid-19 symptoms\n3 - open public testing (eg drive through testing available to asymptomatic people")
 
 testing = st.slider('choose the testing policy applied next week:', 0, 3, 1)
-testingpolicy=pd.Series(7*[testing])
+#testingpolicy=pd.Series(7*[testing])
+#testing2 = st.slider('choose the testing policy applied the week after:', 0, 3, 1)
+#testingpolicy2=pd.concat([testingpolicy,pd.Series(7*[testing2])])
+
 
 st.subheader("Record government policy on contact tracing after a positive diagnosis")
 st.text("0 - no contact tracing\n1 - limited contact tracing; not done for all cases\n2 - comprehensive contact tracing; done for all identified cases")
 
 tracing = st.slider('choose the contact tracing policy applied next week:', 0, 3, 1)
-tracingpolicy=pd.Series(7*[testing])
+#tracingpolicy=pd.Series(7*[tracing])
+#tracing2 = st.slider('choose the contact tracing policy applied the week after:', 0, 3, 1)
+#tracingpolicy2=pd.concat([tracingpolicy,pd.Series(7*[tracing2])])
 
-#Parar probar
-
+#exog variables for the forecast
+variable="h2_testingpolicy_{}".format(country)
+forecastexog=exogenas.loc[:,exogenas.columns.str.contains(country)]
+forecastexog=forecastexog.iloc[-1:,:]
+forecastexog=pd.concat([forecastexog,forecastexog,forecastexog,forecastexog,forecastexog,forecastexog,forecastexog])
+forecastexog=pd.concat([forecastexog,forecastexog])
+new_index = pd.date_range(date.fromordinal(date.today().toordinal()), date.fromordinal(date.today().toordinal()+13))
+forecastexog["index"]=new_index
+forecastexog.index=forecastexog["index"]
+forecastexog=forecastexog.drop('index',axis=1)
+forecastexog.loc[:,"h2_testingpolicy"]=14*[testing]
+forecastexog.loc[:,"tracing"]=14*[testing]
+st.dataframe(forecastexog)
 #Load model and make the predictions
 
 model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1NeoAEr1Ksa_6Mwu1mNABZqoQlrlmvdrd"))

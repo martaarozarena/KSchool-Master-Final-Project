@@ -74,7 +74,7 @@ initialdate = '2020-01-01'   # first day of the year, where most of our data sta
 initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6))
 enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
-exogenas=pd.read_csv("/home/dsc/proyecto/data/exogenas.csv", parse_dates=[0], index_col=[0])
+exogenas=pd.read_csv("https://raw.githubusercontent.com/hnballes/exogenas/master/exogenas.csv", parse_dates=[0], index_col=[0])
 exogenas= exogenas.loc[:, exogenas.columns.str.contains(country)]
 exogenas = exogenas.loc[initialdateshift:enddate]
 
@@ -105,7 +105,7 @@ st.line_chart(X_fc)
 
 
 #Load right model and make the predictions
-model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1shJ2zgyYwaVgd_w9h6aOzbo5o5LtoCZ6"))
+model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1Z9zFsPdlDOr0NeAnHxGSjf8dXXoZ342y"))
 #model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 #predictions

@@ -1,1 +1,1 @@
-web: sh Setup.sh && streamlit run herokutest.py 
+web: sh setup.sh && streamlit run herokutest.py

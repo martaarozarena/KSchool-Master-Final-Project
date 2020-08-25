@@ -105,9 +105,9 @@ st.line_chart(X_fc)
 
 
 #Load right model and make the predictions
-#model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1shJ2zgyYwaVgd_w9h6aOzbo5o5LtoCZ6"))
+model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1shJ2zgyYwaVgd_w9h6aOzbo5o5LtoCZ6"))
 #model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
-model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
+#model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 #predictions
 results=model.get_forecast(steps=14,exog=exogen_joined.iloc[-14:,:])
 st.header("Number of cases next two weeks:")

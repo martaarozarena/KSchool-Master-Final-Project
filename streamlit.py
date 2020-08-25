@@ -8,18 +8,18 @@ from datetime import datetime, timedelta, date
 from sklearn.preprocessing import MinMaxScaler
 
 #Personalize sidebar
-st.markdown(
-    """
-<style>
-.sidebar .sidebar-content {
-    background-image: linear-gradient(#22c9ae,#e6f3e7);
-    color: black;
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
+#st.markdown(
+#    """
+#<style>
+#.sidebar .sidebar-content {
+#    background-image: linear-gradient(#22c9ae,#e6f3e7);
+#    color: black;
+#}
+#</style>
+#""",
+#    unsafe_allow_html=True,
+#)
+#
 ##endogenous variables
 @st.cache
 def data_load(selectedcountry):

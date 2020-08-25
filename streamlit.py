@@ -105,7 +105,7 @@ st.line_chart(X_fc)
 
 
 #Load right model and make the predictions
-model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1Z9zFsPdlDOr0NeAnHxGSjf8dXXoZ342y"))
+model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
 #model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 #predictions

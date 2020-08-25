@@ -21,7 +21,7 @@ from sklearn.preprocessing import MinMaxScaler
 #)
 #
 ##endogenous variables
-@st.cache
+#@st.cache
 def data_load(selectedcountry):
     covid_url = 'https://covid.ourworldindata.org/data/owid-covid-data.csv'
     covid = pd.read_csv(covid_url, parse_dates=['date'], index_col=['date'])

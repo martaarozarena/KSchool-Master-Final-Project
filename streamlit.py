@@ -8,20 +8,20 @@ from datetime import datetime, timedelta, date
 from sklearn.preprocessing import MinMaxScaler
 
 #Personalize sidebar
-st.markdown(
-    """
-<style>
-.sidebar .sidebar-content {
-    background-image: linear-gradient(#22c9ae,#e6f3e7);
-    color: black;
-}
-</style>
-""",
-    unsafe_allow_html=True,
-)
-
+#st.markdown(
+#    """
+#<style>
+#.sidebar .sidebar-content {
+#    background-image: linear-gradient(#22c9ae,#e6f3e7);
+#    color: black;
+#}
+#</style>
+#""",
+#    unsafe_allow_html=True,
+#)
+#
 ##endogenous variables
-@st.cache
+#@st.cache
 def data_load(selectedcountry):
     covid_url = 'https://covid.ourworldindata.org/data/owid-covid-data.csv'
     covid = pd.read_csv(covid_url, parse_dates=['date'], index_col=['date'])
@@ -74,7 +74,7 @@ initialdate = '2020-01-01'   # first day of the year, where most of our data sta
 initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6))
 enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
-exogenas=pd.read_csv("/home/dsc/proyecto/data/exogenas.csv", parse_dates=[0], index_col=[0])
+exogenas=pd.read_csv("https://raw.githubusercontent.com/hnballes/exogenas/master/exogenas.csv", parse_dates=[0], index_col=[0])
 exogenas= exogenas.loc[:, exogenas.columns.str.contains(country)]
 exogenas = exogenas.loc[initialdateshift:enddate]
 
@@ -105,9 +105,9 @@ st.line_chart(X_fc)
 
 
 #Load right model and make the predictions
-#model = joblib.load(urllib.request.urlopen("https://drive.google.com/uc?export=download&id=1shJ2zgyYwaVgd_w9h6aOzbo5o5LtoCZ6"))
-model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
-
+model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
+#model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
+#model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 #predictions
 results=model.get_forecast(steps=14,exog=exogen_joined.iloc[-14:,:])
 st.header("Number of cases next two weeks:")

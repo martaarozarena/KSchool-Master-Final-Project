@@ -116,17 +116,17 @@ def in_out_fcast_plot(model, steps, endog, endog_test, exog_train, exog_test):
     # Generate forecast for test:
     one_step_forecast = model.get_forecast(steps=steps, exog=exog_test)
     
-    # Extract prediction mean
+    # Extract forecast mean
     mean_forecast = one_step_forecast.predicted_mean
     
-    # Get confidence intervals of  predictions
+    # Get confidence intervals of  forecast
     confidence_intervals = one_step_forecast.conf_int()
     
     # Select lower and upper confidence limits
-    lower_limits = confidence_intervals.loc[:,'lower new_cases']
-    upper_limits = confidence_intervals.loc[:,'upper new_cases']
+    lower_limits = confidence_intervals.loc[:,'lower ' + endog.name]
+    upper_limits = confidence_intervals.loc[:,'upper ' + endog.name]
     
-    #Print train and test mean absolute error:
+    #Print test mean absolute error:
     print("Test MAE: %.3f" % mean_absolute_error(endog_test, mean_forecast))
     
     # plot the data
@@ -136,7 +136,7 @@ def in_out_fcast_plot(model, steps, endog, endog_test, exog_train, exog_test):
     # plot in-sample predictions (train)
     plt.plot(in_predictions.index, in_predictions, color='lightcoral', label= 'in-sample predictions (train)')
     
-    # plot mean predictions (test)
+    # plot mean forecast (test)
     plt.plot(mean_forecast.index, mean_forecast, color='r', label='test predictions')
     
     # shade the area between your confidence limits
@@ -144,3 +144,5 @@ def in_out_fcast_plot(model, steps, endog, endog_test, exog_train, exog_test):
     
     plt.xlabel('Date')
     plt.legend()
+    
+    return in_predictions, mean_forecast

@@ -31,7 +31,7 @@ def plot_acf_pacf(timeseries):
     axes[2, 0].plot(timeseries.diff().diff()); axes[2, 0].set_title('2nd Order Differencing')
     sm.graphics.tsa.plot_acf(timeseries.diff().diff().dropna(), lags=40, ax=axes[2, 1])
     sm.graphics.tsa.plot_pacf(timeseries.diff().diff().dropna(), lags=40, ax=axes[2, 2])
-    return plt.show()
+    plt.show()
     
     
 
@@ -84,26 +84,30 @@ def autoarimas(endog_series, exog_series):
     return result_table
 
 
-def cross_val(endog_series, exog_series, model1, model2):
+def cross_val(endog_series, exog_series, model1, model2, model3):
     cv = model_selection.SlidingWindowForecastCV(window_size=100, step=10, h=15)
-    model1_cv_scores = model_selection.cross_val_score(model1, y=endog_series, exogenous=exog_series, scoring='smape', cv=cv)
-    model2_cv_scores = model_selection.cross_val_score(model2, y=endog_series, exogenous=exog_series, scoring='smape', cv=cv)
+    model1_cv_scores = model_selection.cross_val_score(model1, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
+    model2_cv_scores = model_selection.cross_val_score(model2, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
+    model3_cv_scores = model_selection.cross_val_score(model3, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
     
     model1_cv_scoreslist = ["%.4f" % elem for elem in model1_cv_scores]
     model2_cv_scoreslist = ["%.4f" % elem for elem in model2_cv_scores]
+    model3_cv_scoreslist = ["%.4f" % elem for elem in model3_cv_scores]
     print("Model 1 CV scores: {}".format(model1_cv_scoreslist))
     print("Model 2 CV scores: {}".format(model2_cv_scoreslist))
+    print("Model 3 CV scores: {}".format(model3_cv_scoreslist))
 
     # Pick model based on which has a lower average error rate
     m1_average_error = np.average(model1_cv_scores)
     m2_average_error = np.average(model2_cv_scores)
-    errors = [m1_average_error, m2_average_error]
-    models = [model1, model2]
+    m3_average_error = np.average(model3_cv_scores)
+    errors = [m1_average_error, m2_average_error, m3_average_error]
+    models = [model1, model2, model3]
 
     # print out the answer
     better_index = np.argmin(errors)
     best_order = models[better_index].order
-    print("Lowest average SMAPE: {} (model{})".format(errors[better_index], better_index + 1))
+    print("Lowest average MAE: {} (model{})".format(errors[better_index], better_index + 1))
     print("Best model order: {}".format(best_order))
     
     return best_order

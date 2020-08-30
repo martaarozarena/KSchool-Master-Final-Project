@@ -1,6 +1,7 @@
 data/
 .ipynb_checkpoints/
 __pycache__/
+old/
 *.docx
 *.pptx
 *.csv

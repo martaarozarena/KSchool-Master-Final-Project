@@ -134,7 +134,7 @@ st.line_chart(X_fc)
 
 #Load right model and make the predictions
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/models/' + country +'SARIMAXmodel.pkl?raw=true'
-#model = joblib.load(url3)
+#model = pd.read_pickle(url3)
 model = joblib.load('./models/' + country + 'SARIMAXmodel.pkl')
 #model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
 #model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))

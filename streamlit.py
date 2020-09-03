@@ -133,6 +133,7 @@ st.line_chart(X_fc)
 
 
 #Load right model and make the predictions
+#https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/DenmarkSARIMAXmodel.pkl
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/models/' + country +'SARIMAXmodel.pkl?raw=true'
 #model = pd.read_pickle(url3)
 model = joblib.load('./models/' + country + 'SARIMAXmodel.pkl')

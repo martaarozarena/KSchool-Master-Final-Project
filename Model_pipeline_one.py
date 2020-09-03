@@ -32,7 +32,6 @@ args = parser.parse_args()
 
 # In[3]:
 
-
 # We filter the country, the variable to predict and the dates
 
 country = args.countryin
@@ -44,6 +43,7 @@ initialdate = '2020-01-01'   # first day of the year, where most of our data sta
 initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
 enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
+pltpath = './plots/' + country + '_'
 
 # In[4]:
 
@@ -64,21 +64,11 @@ exogenous = pd.read_csv('./data/exogenous.csv', parse_dates=[datecol], index_col
 exogenous_ctryR = exogenous.loc[:, exogenous.columns.str.contains(country)]
 
 
-# In[6]:
+print('************* Read endog and exog csvs')
 
 
-# We check that effectively endogenous and exogenous data have the same length:
-print(len(covid_ctry_varR) == len(exogenous_ctryR))
+# Normalize endogenous and exogenous data
 
-
-# # Visualize endogenous and exogenous data and normalize it all
-
-# In[7]:
-
-
-print(covid_ctry_varR.shape, exogenous_ctryR.shape)
-covid_ctry_varR.plot()
-exogenous_ctryR.plot()
 
 
 # In[8]:
@@ -102,9 +92,7 @@ y = scaled_output.resample('1D').sum()
 # In[10]:
 
 
-print(y.shape, X.shape)
-y.plot()
-X.plot()
+print('************* Endog and exog normalized')
 
 
 # # Split endogenous and exogenous data into train/test
@@ -123,7 +111,7 @@ X_test, y_test = X[train_size:], y[train_size:]
 # In[12]:
 
 
-train_size, test_size
+print('************* Data split into train and test')
 
 
 # # Stationarity: estimate differencing term (d)
@@ -146,23 +134,12 @@ d_pp = ndiffs(y_train, test='pp')
 print('PP test: ', d_pp)
 
 
-# In[14]:
-
-
-# Plotting ACF and PACF for different 'd' values (d=1, d=2):
-
-datatools.plot_acf_pacf(y_train)
-sns.reset_defaults
-plt.rcParams["figure.figsize"] = (15, 5)
-
-
-# **Consider if d=1 would be best, since the ACF/PACF for d=2 turns largely negative at lag 1, which is an indication that the series may be over-differenced**
 
 # In[15]:
 
 
 # Test stationarity and print results of ADF test:
-datatools.test_stationarity(y_train.diff().dropna())
+#datatools.test_stationarity(y_train.diff().dropna())
 
 
 # # Estimate orders p and q of ARIMA model, using auto_arima
@@ -172,8 +149,8 @@ datatools.test_stationarity(y_train.diff().dropna())
 
 # Perform different auto_arima searches and sort results by lowest AIC:
 result_table = datatools.autoarimas(y_train, X_train)
-result_table
 
+print('************* Autoarimas done')
 
 # # Perform cross-validation on top 2 models and select the best. Then train and fit SARIMAX model with the one that gave best results
 
@@ -185,28 +162,25 @@ model1 = ARIMA(order=result_table.iloc[0,0])
 model2 = ARIMA(order=result_table.iloc[1,0])
 model3 = ARIMA(order=result_table.iloc[2,0])
 
+print('************* Arima instances done')
 
 # In[45]:
 
-
 best_order = datatools.cross_val(y_train, X_train, model1, model2, model3)
 
+print('************* Cross validation done')
 
 # In[68]:
 
 
-best_model = sm.tsa.statespace.SARIMAX(y_train, order=(0,2,3), exog=X_train)
+best_model = sm.tsa.statespace.SARIMAX(y_train, order=best_order, exog=X_train)
 results = best_model.fit()
-print(results.summary())
-results.plot_diagnostics(figsize=(15,10));
+#print(results.summary())
+#results.plot_diagnostics(figsize=(15,10));
 
+print('************* Sarimax model fitted')
 
 # # Perform/plot in-sample prediction and out-of-sample forecast and evaluate model MAE
-
-# In[69]:
-
-
-train_size, test_size, X_test.shape
 
 
 # In[70]:
@@ -215,9 +189,12 @@ train_size, test_size, X_test.shape
 in_predictions, mean_forecast = datatools.in_out_fcast_plot(results, test_size, y, y_test, X_train, X_test)
 
 # set title and show plot
-plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (0-1 scale)')
-plt.show()
+plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (0-1 scale) for {}'.format(country))
+plt.savefig(pltpath + 'inoutpred.png')
+#plt.show()
+plt.close()
 
+print('************* In sample and out of sample forecast and plot done')
 
 # # Scale data back to original values and plot
 
@@ -234,6 +211,7 @@ trainPredictS = pd.Series(trainPredict.flatten(), index=covid_ctry_varR[:train_s
 testPredict = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
 testPredictS = pd.Series(testPredict.flatten(), index=covid_ctry_varR[train_size:].index, name=covid_ctry_varR.columns[0])
 
+print('************* Did inverse transform to scale back data')
 
 # In[73]:
 
@@ -249,10 +227,12 @@ plt.plot(testPredictS.index, testPredictS, color='r', label='test predictions')
 
 # set labels, legends and show plot
 plt.xlabel('Date')
-plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (original scale)')
+plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (original scale) for {}'.format(country))
 plt.rcParams["figure.figsize"] = (20, 8)
 plt.legend()
-plt.show()
+plt.savefig(pltpath + 'inoutpredorig.png')
+#plt.show()
+plt.close()
 
 
 # In[74]:
@@ -272,18 +252,19 @@ filename = './models/' + country + 'SARIMAXmodel.pkl'
 # Pickle it
 joblib.dump(results, filename)
 
+print('************* Plotted in-sample prediction and saved model')
 
 # In[76]:
 
 
 # Load the model back in
-loaded_model = joblib.load(filename)
+#loaded_model = joblib.load(filename)
 
 
 # In[77]:
 
 
-loaded_model.summary()
+#loaded_model.summary()
 
 
 # # Update model with test observations, to get it ready for future forecasts
@@ -294,28 +275,29 @@ loaded_model.summary()
 # Update model with test sample and re-fit parameters:
 res_updated = results.append(y_test, exog=X_test, refit=True)
 
+print('************* Updated model with test observations')
 
 # In[79]:
 
 
 # Print summary of updated model and plot diagnostics, to confirm everything working as expected:
-print(res_updated.summary())
-res_updated.plot_diagnostics(figsize=(15,10));
+#print(res_updated.summary())
+#res_updated.plot_diagnostics(figsize=(15,10));
 
 
 # In[80]:
 
 
 # Plot the updated data
-plt.rcParams["figure.figsize"] = (20, 8)
-plt.plot(y.index, y, label='observed')
+#plt.rcParams["figure.figsize"] = (20, 8)
+#plt.plot(y.index, y, label='observed')
 
 # plot in-sample predictions (train+test)
-plt.plot(res_updated.fittedvalues.index, res_updated.fittedvalues, color='lightcoral', label= 'updated model')
-plt.xlabel('Date')
-plt.title('Coronavirus 7-day rolling mean in-sample predictions (after updating model with test sample)')
-plt.legend()
-plt.show()
+#plt.plot(res_updated.fittedvalues.index, res_updated.fittedvalues, color='lightcoral', label= 'updated model')
+#plt.xlabel('Date')
+#plt.title('Coronavirus 7-day rolling mean in-sample predictions (after updating model with test sample)')
+#plt.legend()
+#plt.show()
 
 
 # In[81]:
@@ -325,6 +307,7 @@ plt.show()
 
 joblib.dump(res_updated, filename)
 
+print('************* Saved model again, now including test observations')
 
 # # Perform forecast
 
@@ -334,9 +317,10 @@ joblib.dump(res_updated, filename)
 forecastdays = 14
 new_begin = str(date.fromordinal(datetime.strptime(enddate, '%Y-%m-%d').toordinal() + 1))
 new_date = str(date.fromordinal(datetime.strptime(enddate, '%Y-%m-%d').toordinal() + forecastdays))
-new_index = pd.date_range(initialdateshift, new_date, freq='D')
+new_index = pd.date_range(initialdate, new_date, freq='D')
 exog_conc = exogenous_ctryR.reindex(new_index).interpolate()
 
+print('************* Concatenated 14 new data lines to exog')
 
 # In[83]:
 
@@ -346,8 +330,9 @@ sc_in_fc = MinMaxScaler(feature_range=(0, 1))
 scaled_input_fc = sc_in_fc.fit_transform(exog_conc)
 scaled_input_fc = pd.DataFrame(scaled_input_fc, index=exog_conc.index, columns=exog_conc.columns)
 X_fc = scaled_input_fc
-X_fc.plot()
+#X_fc.plot()
 
+print('************* Re-scaled again exog with 14 new data lines')
 
 # In[84]:
 
@@ -367,23 +352,24 @@ lower_limits = confidence_intervals.loc[:,'lower ' + y.name]
 upper_limits = confidence_intervals.loc[:,'upper ' + y.name]
 
 # Print best estimate  predictions
-print(mean_forecast.values)
+#print(mean_forecast.values)
 
 # plot the data
-plt.plot(y.index, y, label='observed')
+#plt.plot(y.index, y, label='observed')
 
 # plot your mean predictions
-plt.plot(mean_forecast.index, mean_forecast, color='r', label='forecast')
+#plt.plot(mean_forecast.index, mean_forecast, color='r', label='forecast')
 
 # shade the area between your confidence limits
-plt.fill_between(lower_limits.index, lower_limits, upper_limits, color='pink')
+#plt.fill_between(lower_limits.index, lower_limits, upper_limits, color='pink')
 
 # set labels, legends and show plot
-plt.xlabel('Date')
-plt.title('Coronavirus 7-day rolling mean forecast')
-plt.legend()
-plt.show()
+#plt.xlabel('Date')
+#plt.title('Coronavirus 7-day rolling mean forecast')
+#plt.legend()
+#plt.show()
 
+print('************* Done out of sample 14 days forecast')
 
 # In[85]:
 
@@ -397,6 +383,7 @@ forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, na
 forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
 forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
 
+print('************* Did inverse transform to scale back data, after 14 days forecast')
 
 # In[86]:
 
@@ -412,10 +399,13 @@ plt.fill_between(forecast14_llS.index, forecast14_llS, forecast14_ulS, color='pi
 
 # set labels, legends and show plot
 plt.xlabel('Date')
-plt.title('Coronavirus 7-day rolling mean forecast (original scale)')
+plt.title('Coronavirus (7-day rolling mean) 14 days forecast (original scale) for {}'.format(country))
 plt.legend()
-plt.show()
+plt.savefig(pltpath + 'outfcastorig.png')
+#plt.show()
+plt.close()
 
+print('************* Plotted 14 days forecast in original scale')
 
 # In[87]:
 
@@ -423,5 +413,5 @@ plt.show()
 # Print forecasted values:
 
 forecast14S_l = ["%.1f" % elem for elem in forecast14S]
-print(forecast14S_l)
+print('Next 14 days forecast values: ', forecast14S_l)
 

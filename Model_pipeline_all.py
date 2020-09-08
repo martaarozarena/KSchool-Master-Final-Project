@@ -8,3 +8,5 @@ countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kin
 
 for i in countries.split('|'):
     subprocess.Popen(["python", ".\Model_pipeline_one.py", i])
+    
+

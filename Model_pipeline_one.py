@@ -22,7 +22,10 @@ from sklearn.preprocessing import MinMaxScaler
 import joblib
 import datatools
 import argparse
+import time
 
+
+start_time = time.time()
 
 parser = argparse.ArgumentParser()
 parser.add_argument('countryin')
@@ -157,7 +160,7 @@ print('************* Autoarimas done')
 # In[44]:
 
 
-# Extract top 2 models from previous step (first 2 elements, since they are sorted):
+# Extract top 3 models from previous step (first 3 elements, since they are sorted):
 model1 = ARIMA(order=result_table.iloc[0,0])
 model2 = ARIMA(order=result_table.iloc[1,0])
 model3 = ARIMA(order=result_table.iloc[2,0])
@@ -414,4 +417,8 @@ print('************* Plotted 14 days forecast in original scale')
 
 forecast14S_l = ["%.1f" % elem for elem in forecast14S]
 print('Next 14 days forecast values: ', forecast14S_l)
+
+runtime = time.gmtime(time.time() - start_time)
+res = time.strftime('%M:%S', runtime)
+print("Took %s mins/secs to create the %s model" % (res, country))
 

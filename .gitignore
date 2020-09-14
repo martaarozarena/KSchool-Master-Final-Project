@@ -1,4 +1,5 @@
 data_old/
+plots_old/
 .ipynb_checkpoints/
 __pycache__/
 old/

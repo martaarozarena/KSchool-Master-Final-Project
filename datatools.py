@@ -131,7 +131,7 @@ def in_out_fcast_plot(model, steps, endog, endog_test, exog_train, exog_test):
     upper_limits = confidence_intervals.loc[:,'upper ' + endog.name]
     
     #Print test mean absolute error:
-    print("Test MAE: %.3f" % mean_absolute_error(endog_test, mean_forecast))
+    print("Test MAE (0-1 scale): %.3f" % mean_absolute_error(endog_test, mean_forecast))
     
     # plot the data
     plt.rcParams.update({'figure.figsize':(20,10), 'xtick.labelsize':'small', 'ytick.labelsize':'small', 'axes.titlesize':'large'})

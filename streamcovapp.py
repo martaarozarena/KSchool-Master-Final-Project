@@ -96,15 +96,23 @@ def get_exog(datecol, country):
 exog_ctry = get_exog(datecol, country)
 
 #@st.cache
-#def get_model():
-#    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
-#    smodel = joblib.load(urllib.request.urlopen(url3))
-#    return smodel
+def get_model():
+    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
+    smodel = joblib.load(urllib.request.urlopen(url3))
+    return smodel
 
-#model = get_model()
+model = get_model()
 
-url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
-model = joblib.load(urllib.request.urlopen(url3))
+#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
+#model = joblib.load(urllib.request.urlopen(url3))
+
+#Load the country model and make the predictions
+#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
+#model = pd.read_pickle(url3)
+#model = joblib.load(urllib.request.urlopen(url3))
+#model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
+#model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
+#model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
 # Building the future exogenous dataframe, interpolating from last observed values
@@ -162,7 +170,7 @@ past_plt = alt.Chart(past_rs).mark_line().encode(
 ).properties(
     width=800,
     height=300
-)
+).interactive()
 
 future_rs = forecast14S.to_frame().reset_index()
 future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
@@ -172,6 +180,6 @@ future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
 ).properties(
     width=800,
     height=300
-)
+).interactive()
 
 st.altair_chart(past_plt + future_plt)

@@ -157,7 +157,7 @@ in_predictions, mean_forecast = datatools.in_out_fcast_plot(results, test_size, 
 #plt.show()
 plt.close()
 
-print('************* In sample and out of sample forecast and plot done')
+print('************* In sample and out of sample forecast done')
 
 # # Scale data back to original values and plot
 

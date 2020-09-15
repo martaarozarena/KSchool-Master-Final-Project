@@ -7,28 +7,7 @@ import urllib.request
 from datetime import datetime, timedelta, date
 from sklearn.preprocessing import MinMaxScaler
 
-#Personalize sidebar
-#st.markdown(
-#    """
-#<style>
-#.sidebar .sidebar-content {
-#    background-image: linear-gradient(#22c9ae,#e6f3e7);
-#    color: black;
-#}
-#</style>
-#""",
-#    unsafe_allow_html=True,
-#)
-#
-##endogenous variables
-#@st.cache
 
-
-variable = 'new_cases_'
-initialdate = '2020-01-01'   # first day of the year, where most of our data starts
-# moving intialdate by 6, since we later apply 7-day rolling mean to our data:
-initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
-enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
 #def data_load(selectedcountry):
     
@@ -72,7 +51,6 @@ testing = st.sidebar.slider('Select testing policy for next week:', 0, 3, 1)
 testing2 = st.sidebar.slider('Select testing policy for the week after:', 0, 3, 1)
 
 
-
 st.sidebar.subheader("Record government policy on contact tracing after a positive diagnosis")
 st.sidebar.text("0 - no contact tracing\n1 - limited contact tracing; not done for all cases\n2 - comprehensive contact tracing; done for all identified cases")
 
@@ -86,8 +64,15 @@ tracing2 = st.sidebar.slider('Select contact tracing policy for the week after:'
 #initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6))
 #enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
+variable = 'new_cases_'
+initialdate = '2020-01-01'   # first day of the year, where most of our data starts
+# moving intialdate by 6, since we later apply 7-day rolling mean to our data:
+#initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
+enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 datecol = 'date'
 col = variable + country
+
+
 url1 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/endogenous.csv'
 covid_ctry_varR = pd.read_csv(url1, parse_dates=[datecol], index_col=[datecol], usecols=[datecol, col])
 
@@ -134,7 +119,7 @@ st.line_chart(X_fc)
 
 #Load right model and make the predictions
 #https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/DenmarkSARIMAXmodel.pkl
-#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/models/' + country +'SARIMAXmodel.pkl?raw=true'
+#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = pd.read_pickle(url3)
 model = joblib.load('./models/' + country + 'SARIMAXmodel.pkl')
 #model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))

@@ -200,7 +200,7 @@ print("Test MAE (original scale): %.3f" % mean_absolute_error(covid_ctry_varR[tr
 
 
 # Set model name
-filename = './models/' + country + 'SARIMAXmodel.pkl'
+filename = './models/' + country.replace(" ", "") + 'SARIMAXmodel.pkl'
 
 # Pickle it
 joblib.dump(results, filename)

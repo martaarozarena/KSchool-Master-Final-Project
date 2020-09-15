@@ -1,5 +1,6 @@
 data_old/
 plots_old/
+models_old/
 .ipynb_checkpoints/
 __pycache__/
 old/
@@ -7,4 +8,3 @@ old/
 *.pptx
 *.csv
 *.xlsx
-*.pkl

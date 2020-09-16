@@ -10,14 +10,17 @@ import altair as alt
 
 # Create a title, a header.
 st.markdown("# Coronavirus forecast")
-st.markdown("This is an app for predicting the number of new coronavirus cases for the next 2 weeks, using publicly available data.")
-st.markdown("")
+st.markdown("This is an app for predicting the number of coronavirus cases for the next 14 days, using publicly available data.")
+st.markdown("Please select in the left sidebar the country where you want to make the prediction on. If you don't change anything, \
+            you see the forecast in an scenario where nothing else changes.")
+st.markdown("Then you can play with the 2 values below, to see how modifying certain policies affects the forecast.")
+#st.markdown("")
 
 # Chooose a country to predict the cases
-st.sidebar.title("Select a country")
-country = st.sidebar.selectbox("", ("Denmark","Germany","Spain","Finland","Italy","Sweden","France","Norway","United Kingdom",
-                                    "United States","Canada","Mexico","Australia","Indonesia","Malaysia","Philippines","Thailand",
-                                    "Vietnam","China","India","Japan","Singapore","Taiwan","Saudi Arabia","United Arab Emirates"))
+st.sidebar.subheader("Select a country")
+country = st.sidebar.selectbox('', ('Australia','Canada','China','Denmark','Finland','France','Germany','India','Indonesia',
+                                    'Italy','Japan','Malaysia','Mexico','Norway','Philippines','Saudi Arabia','Singapore',
+                                    'Spain','Sweden','Taiwan','Thailand','United Arab Emirates','United Kingdom','United States','Vietnam'))
 
 variable = 'new_cases_'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
@@ -81,7 +84,7 @@ testing = st.sidebar.slider(label='Select testing policy for next week:', min_va
 testing2 = st.sidebar.slider(label='Select testing policy for the week after:', min_value=0, max_value=3, value=last_test_value, step=1)
 
 
-st.sidebar.subheader("Government policy on contact tracing after a positive diagnosis")
+st.sidebar.subheader("Contact tracing policy after a positive diagnosis")
 st.sidebar.text("0 - no contact tracing\n1 - limited contact tracing; not done for all cases\n2 - comprehensive contact tracing; done for all identified cases")
 
 tracing = st.sidebar.slider(label='Select contact tracing policy for next week:', min_value=0, max_value=2, value=last_contact_value, step=1)
@@ -149,10 +152,15 @@ forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
 forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
 fcast_ul_df = forecast14_ulS.to_frame().reset_index()
 
-# Build dataframe for Altair graph
 conf_int = pd.concat([fcast_ll_df, fcast_ul_df.iloc[:, 1]], axis=1)
 
+last_endog = endog_ctry.tail(1)
+first_fut = forecast14S.head(1).to_frame()
+first_fut.columns = [endog_ctry.columns[0]]
+nexus = pd.concat([last_endog, first_fut]).reset_index()
 
+
+# Build dataframe for Altair graph
 past_rs = endog_ctry.reset_index()
 past_plt = alt.Chart(past_rs).mark_line().encode(
     x='date:T',
@@ -163,14 +171,20 @@ past_plt = alt.Chart(past_rs).mark_line().encode(
     height=300
 ).interactive()
 
+nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
+    x='index:T',
+    y=col
+)
+
 future_rs = forecast14S.to_frame().reset_index()
 future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
     x=alt.X('index:T', axis=alt.Axis(title='Date')),
-    y=alt.Y('new_cases_forecast', axis=alt.Axis(title='New coronavirus cases'), title='liijl'),
+    y=alt.Y('new_cases_forecast', axis=alt.Axis(title='Coronavirus confirmed cases'), title='liijl'),
     tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
 ).properties(
     width=700,
-    height=300
+    height=300,
+    title='Coronavirus confirmed cases (7-day rolling mean)'
 ).interactive()
 
 confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
@@ -180,11 +194,11 @@ confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode
 )
 
 
-st.markdown("### Coronavirus confirmed cases forecast for the next two weeks for {}".format(country))
+st.markdown("### Coronavirus confirmed cases 14 days forecast for {}".format(country))
 #st.dataframe(future_rs.T)
 st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
 
-st.altair_chart(past_plt + future_plt + confint_plot)
+st.altair_chart(past_plt + future_plt + nex + confint_plot)
 
 st.markdown('Forecasted daily confirmed cases:')
 forecast14S_l = ["%.1f" % elem for elem in forecast14S]

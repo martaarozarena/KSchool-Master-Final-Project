@@ -8,62 +8,16 @@ from datetime import datetime, timedelta, date
 from sklearn.preprocessing import MinMaxScaler
 import altair as alt
 
-
-
-#def data_load(selectedcountry):
-    
-#    covid_url = 'https://covid.ourworldindata.org/data/owid-covid-data.csv'
-#    covid = pd.read_csv(covid_url, parse_dates=['date'], index_col=['date'])
-
-    # We filter the country, dates and the variable to predict
-
-#    country = selectedcountry
-#    variable = 'new_cases' #we could make it a selectbox
-#    initialdate = '2020-01-01'   # first day of the year, where most of our data starts
-#    initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6))
-#    enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
-
-    # Filtering country and dates
-#    covid_ctry = covid[covid['location']==country]
-#    covid_ctry = covid_ctry.loc[initialdate:enddate]
-
-    # Filter the variable to predict and applying 7-day rolling mean
-#    covid_ctry_var = covid_ctry[variable]
-#    covid_ctry_varR = covid_ctry_var.rolling(7).mean().dropna()
-    
-#    return covid_ctry_varR
-
-
 # Create a title, a header.
-st.title("Coronavirus forecast")
-st.header("This is an app for predicting the number of new coronavirus cases for the next 2 weeks, using publicly available data. ")
+st.markdown("# Coronavirus forecast")
+st.markdown("This is an app for predicting the number of new coronavirus cases for the next 2 weeks, using publicly available data.")
+st.markdown("")
 
-#chooose a country to predict the cases
-st.sidebar.title("Choose a country")
+# Chooose a country to predict the cases
+st.sidebar.title("Select a country")
 country = st.sidebar.selectbox("", ("Denmark","Germany","Spain","Finland","Italy","Sweden","France","Norway","United Kingdom",
                                     "United States","Canada","Mexico","Australia","Indonesia","Malaysia","Philippines","Thailand",
                                     "Vietnam","China","India","Japan","Singapore","Taiwan","Saudi Arabia","United Arab Emirates"))
-
-#select the values of the 2 diferent variables
-st.sidebar.subheader("Testing policy")
-st.sidebar.text("0 - no testing policy\n1 - only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers)\n2 - testing of anyone showing Covid-19 symptoms\n3 - open public testing (eg drive through testing available to asymptomatic people")
-
-testing = st.sidebar.slider('Select testing policy for next week:', 0, 3, 1)
-testing2 = st.sidebar.slider('Select testing policy for the week after:', 0, 3, 1)
-
-
-st.sidebar.subheader("Record government policy on contact tracing after a positive diagnosis")
-st.sidebar.text("0 - no contact tracing\n1 - limited contact tracing; not done for all cases\n2 - comprehensive contact tracing; done for all identified cases")
-
-tracing = st.sidebar.slider('Select contact tracing policy for next week:', 0, 3, 1)
-tracing2 = st.sidebar.slider('Select contact tracing policy for the week after:', 0, 3, 1)
-
-#extend the last value of the futur exogenous variables and add the 2 values the user introduced
-#create the dataframe of the next 14 days and join it to the old exogenous
-
-#initialdate = '2020-01-01'   # first day of the year, where most of our data starts
-#initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6))
-#enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
 variable = 'new_cases_'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
@@ -95,9 +49,12 @@ def get_exog(datecol, country):
 
 exog_ctry = get_exog(datecol, country)
 
+last_test_value = int(exog_ctry.iloc[-1, exog_ctry.columns.str.contains('Testing|Contact')][0])
+last_contact_value = int(exog_ctry.iloc[-1, exog_ctry.columns.str.contains('Testing|Contact')][1])
+
 #@st.cache
 def get_model():
-    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
+    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country.replace(" ", "") +'SARIMAXmodel.pkl'
     smodel = joblib.load(urllib.request.urlopen(url3))
     return smodel
 
@@ -115,6 +72,25 @@ model = get_model()
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
+
+# Select the values of the 2 diferent variables
+st.sidebar.subheader("Testing policy")
+st.sidebar.text("0 - no testing policy\n1 - only those who both (a) have symptoms AND (b) meet specific criteria (eg key workers)\n2 - testing of anyone showing Covid-19 symptoms\n3 - open public testing (eg drive through testing available to asymptomatic people")
+
+testing = st.sidebar.slider(label='Select testing policy for next week:', min_value=0, max_value=3, value=last_test_value, step=1)
+testing2 = st.sidebar.slider(label='Select testing policy for the week after:', min_value=0, max_value=3, value=last_test_value, step=1)
+
+
+st.sidebar.subheader("Government policy on contact tracing after a positive diagnosis")
+st.sidebar.text("0 - no contact tracing\n1 - limited contact tracing; not done for all cases\n2 - comprehensive contact tracing; done for all identified cases")
+
+tracing = st.sidebar.slider(label='Select contact tracing policy for next week:', min_value=0, max_value=2, value=last_contact_value, step=1)
+tracing2 = st.sidebar.slider(label='Select contact tracing policy for the week after:', min_value=0, max_value=2, value=last_contact_value, step=1)
+
+
+
+
+
 # Building the future exogenous dataframe, interpolating from last observed values
 forecastdays = 14
 new_begin = str(date.fromordinal(datetime.strptime(enddate, '%Y-%m-%d').toordinal() + 1))
@@ -129,7 +105,7 @@ exog_futur.loc[date.fromordinal(date.today().toordinal()+7): ,"H2_Testing policy
 exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
 exog_futur.loc[date.fromordinal(date.today().toordinal()+7):, "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
 
-st.dataframe(exog_futur)
+#st.dataframe(exog_futur)
 
 
 # Re-scale exogenous data with new added days:
@@ -138,7 +114,7 @@ sc_in_fc = MinMaxScaler(feature_range=(0, 1))
 scaled_input_fc = sc_in_fc.fit_transform(exog_futur)
 scaled_input_fc = pd.DataFrame(scaled_input_fc, index=exog_futur.index, columns=exog_futur.columns)
 X_fc = scaled_input_fc
-st.line_chart(X_fc)
+#st.line_chart(X_fc)
 
 
 #Load the country model and make the predictions
@@ -183,7 +159,7 @@ past_plt = alt.Chart(past_rs).mark_line().encode(
     y=col,
     tooltip=alt.Tooltip(col, format='.1f')
 ).properties(
-    width=800,
+    width=700,
     height=300
 ).interactive()
 
@@ -193,7 +169,7 @@ future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
     y=alt.Y('new_cases_forecast', axis=alt.Axis(title='New coronavirus cases'), title='liijl'),
     tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
 ).properties(
-    width=800,
+    width=700,
     height=300
 ).interactive()
 
@@ -204,12 +180,13 @@ confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode
 )
 
 
-st.header("Number of new coronavirus cases for the next two weeks")
+st.markdown("### Coronavirus confirmed cases forecast for the next two weeks for {}".format(country))
 #st.dataframe(future_rs.T)
-st.subheader("Graph (in blus the past, in orange the forecast with the confidence intervals):")
+st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
 
 st.altair_chart(past_plt + future_plt + confint_plot)
 
-st.subheader('Numbers:')
+st.markdown('Forecasted daily confirmed cases:')
 forecast14S_l = ["%.1f" % elem for elem in forecast14S]
-st.write(forecast14S_l)
+st.write(str(forecast14S_l)[1:-1])
+

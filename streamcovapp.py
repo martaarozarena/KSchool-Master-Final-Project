@@ -34,9 +34,9 @@ import altair as alt
 #    return covid_ctry_varR
 
 
-# Create a title, a subheader.
+# Create a title, a header.
 st.title("Coronavirus forecast")
-st.subheader("This is an app for predicting the number of new coronavirus cases for the next 2 weeks, using publicly available data. ")
+st.header("This is an app for predicting the number of new coronavirus cases for the next 2 weeks, using publicly available data. ")
 
 #chooose a country to predict the cases
 st.sidebar.title("Choose a country")
@@ -157,10 +157,25 @@ mean_forecast = results.predicted_mean
 forecast14 = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
 forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name='new_cases_forecast')
 
+# Get confidence intervals of  predictions
+confidence_intervals = results.conf_int()
 
-st.header("Number of new coronavirus cases for the next two weeks:")
-st.dataframe(forecast14S)
-st.subheader("Graph")
+# Select lower and upper confidence limits
+lower_limits = confidence_intervals.loc[:,'lower ' + scaled_output.name]
+upper_limits = confidence_intervals.loc[:,'upper ' + scaled_output.name]
+
+# Apply inverse transform to get back to original scale
+forecast14_ll = sc_out.inverse_transform(lower_limits.values.reshape(-1,1))
+forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, name='new_cases_forecast_ll')
+fcast_ll_df = forecast14_llS.to_frame().reset_index()
+
+forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
+forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
+fcast_ul_df = forecast14_ulS.to_frame().reset_index()
+
+# Build dataframe for Altair graph
+conf_int = pd.concat([fcast_ll_df, fcast_ul_df.iloc[:, 1]], axis=1)
+
 
 past_rs = endog_ctry.reset_index()
 past_plt = alt.Chart(past_rs).mark_line().encode(
@@ -174,12 +189,27 @@ past_plt = alt.Chart(past_rs).mark_line().encode(
 
 future_rs = forecast14S.to_frame().reset_index()
 future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
-    x='index:T',
-    y='new_cases_forecast',
+    x=alt.X('index:T', axis=alt.Axis(title='Date')),
+    y=alt.Y('new_cases_forecast', axis=alt.Axis(title='New coronavirus cases'), title='liijl'),
     tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
 ).properties(
     width=800,
     height=300
 ).interactive()
 
-st.altair_chart(past_plt + future_plt)
+confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
+    alt.X('index:T'),
+    alt.Y('new_cases_forecast_ll'),
+    alt.Y2('new_cases_forecast_ul')
+)
+
+
+st.header("Number of new coronavirus cases for the next two weeks")
+#st.dataframe(future_rs.T)
+st.subheader("Graph (in blus the past, in orange the forecast with the confidence intervals):")
+
+st.altair_chart(past_plt + future_plt + confint_plot)
+
+st.subheader('Numbers:')
+forecast14S_l = ["%.1f" % elem for elem in forecast14S]
+st.write(forecast14S_l)

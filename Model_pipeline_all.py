@@ -1,3 +1,5 @@
+import warnings
+warnings.filterwarnings('ignore')
 from subprocess import run, PIPE, STDOUT
 import time
 #import atexit

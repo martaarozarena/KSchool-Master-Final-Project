@@ -22,13 +22,16 @@ country = st.sidebar.selectbox('', ('Australia','Canada','China','Denmark','Finl
                                     'Italy','Japan','Malaysia','Mexico','Norway','Philippines','Saudi Arabia','Singapore',
                                     'Spain','Sweden','Taiwan','Thailand','United Arab Emirates','United Kingdom','United States','Vietnam'))
 
-variable = 'new_cases_'
+var_c = 'new_cases_'
+var_d = 'new_deaths_'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
 # moving intialdate by 6, since we later apply 7-day rolling mean to our data:
 #initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
 enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 datecol = 'date'
-col = variable + country
+col_c = var_c + country
+col_d = var_d + country
+
 
 @st.cache
 def get_endog(datecol, col):
@@ -36,11 +39,8 @@ def get_endog(datecol, col):
     covid_ctry_varR = pd.read_csv(url1, parse_dates=[datecol], index_col=[datecol], usecols=[datecol, col])
     return covid_ctry_varR
 
-endog_ctry = get_endog(datecol, col)
-
-sc_out = MinMaxScaler(feature_range=(0, 1))
-scaled_output = sc_out.fit_transform(endog_ctry)
-scaled_output  = pd.Series(scaled_output.flatten(), index=endog_ctry.index, name=endog_ctry.columns[0])
+endog_ctry_c = get_endog(datecol, col_c)
+endog_ctry_d = get_endog(datecol, col_d)
 
 
 @st.cache
@@ -61,7 +61,7 @@ def get_model():
     smodel = joblib.load(urllib.request.urlopen(url3))
     return smodel
 
-model = get_model()
+model_c = get_model()
 
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = joblib.load(urllib.request.urlopen(url3))
@@ -89,9 +89,6 @@ st.sidebar.text("0 - no contact tracing\n1 - limited contact tracing; not done f
 
 tracing = st.sidebar.slider(label='Select contact tracing policy for next week:', min_value=0, max_value=2, value=last_contact_value, step=1)
 tracing2 = st.sidebar.slider(label='Select contact tracing policy for the week after:', min_value=0, max_value=2, value=last_contact_value, step=1)
-
-
-
 
 
 # Building the future exogenous dataframe, interpolating from last observed values
@@ -129,74 +126,82 @@ X_fc = scaled_input_fc
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
-# Predictions
-results = model.get_forecast(steps=14, exog=X_fc[new_begin:new_date])
-mean_forecast = results.predicted_mean
+def various(endog_ctry, col, model):
+    # Scaling the endogenous data
+    sc_out = MinMaxScaler(feature_range=(0, 1))
+    scaled_output = sc_out.fit_transform(endog_ctry)
+    scaled_output  = pd.Series(scaled_output.flatten(), index=endog_ctry.index, name=endog_ctry.columns[0])
 
-forecast14 = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
-forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name='new_cases_forecast')
+    # Predictions
+    results = model.get_forecast(steps=14, exog=X_fc[new_begin:new_date])
+    mean_forecast = results.predicted_mean
 
-# Get confidence intervals of  predictions
-confidence_intervals = results.conf_int()
+    forecast14 = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
+    forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name='new_cases_forecast')
 
-# Select lower and upper confidence limits
-lower_limits = confidence_intervals.loc[:,'lower ' + scaled_output.name]
-upper_limits = confidence_intervals.loc[:,'upper ' + scaled_output.name]
+    # Get confidence intervals of  predictions
+    confidence_intervals = results.conf_int()
 
-# Apply inverse transform to get back to original scale
-forecast14_ll = sc_out.inverse_transform(lower_limits.values.reshape(-1,1))
-forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, name='new_cases_forecast_ll')
-fcast_ll_df = forecast14_llS.to_frame().reset_index()
+    # Select lower and upper confidence limits
+    lower_limits = confidence_intervals.loc[:,'lower ' + scaled_output.name]
+    upper_limits = confidence_intervals.loc[:,'upper ' + scaled_output.name]
 
-forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
-forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
-fcast_ul_df = forecast14_ulS.to_frame().reset_index()
+    # Apply inverse transform to get back to original scale
+    forecast14_ll = sc_out.inverse_transform(lower_limits.values.reshape(-1,1))
+    forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, name='new_cases_forecast_ll')
+    fcast_ll_df = forecast14_llS.to_frame().reset_index()
 
-conf_int = pd.concat([fcast_ll_df, fcast_ul_df.iloc[:, 1]], axis=1)
+    forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
+    forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
+    fcast_ul_df = forecast14_ulS.to_frame().reset_index()
 
-last_endog = endog_ctry.tail(1)
-first_fut = forecast14S.head(1).to_frame()
-first_fut.columns = [endog_ctry.columns[0]]
-nexus = pd.concat([last_endog, first_fut]).reset_index()
+    conf_int = pd.concat([fcast_ll_df, fcast_ul_df.iloc[:, 1]], axis=1)
 
-
-# Build dataframe for Altair graph
-past_rs = endog_ctry.reset_index()
-past_plt = alt.Chart(past_rs).mark_line().encode(
-    x='date:T',
-    y=col,
-    tooltip=alt.Tooltip(col, format='.1f')
-).interactive()
-
-nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
-    x='index:T',
-    y=col
-)
-
-future_rs = forecast14S.to_frame().reset_index()
-future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
-    x=alt.X('index:T', axis=alt.Axis(title='Date')),
-    y=alt.Y('new_cases_forecast', axis=alt.Axis(title=None)),
-    tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
-).interactive()
-
-confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
-    alt.X('index:T'),
-    alt.Y('new_cases_forecast_ll'),
-    alt.Y2('new_cases_forecast_ul')
-)
+    last_endog = endog_ctry.tail(1)
+    first_fut = forecast14S.head(1).to_frame()
+    first_fut.columns = [endog_ctry.columns[0]]
+    nexus = pd.concat([last_endog, first_fut]).reset_index()
 
 
-st.markdown("### Coronavirus confirmed cases 14 days forecast for {}".format(country))
-#st.dataframe(future_rs.T)
-st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
+    # Build dataframe for Altair graph
+    past_rs = endog_ctry.reset_index()
+    past_plt = alt.Chart(past_rs).mark_line().encode(
+        x='date:T',
+        y=col,
+        tooltip=alt.Tooltip(col, format='.1f')
+    ).interactive()
 
-st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
-    width=650,
-    height=350,
-    title='Coronavirus confirmed cases (7-day rolling mean)'))
+    nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
+        x='index:T',
+        y=col
+    )
 
-st.markdown('Forecasted daily confirmed cases:')
-forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
-st.text(str(forecast14S_l)[1:-1])
+    future_rs = forecast14S.to_frame().reset_index()
+    future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
+        x=alt.X('index:T', axis=alt.Axis(title='Date')),
+        y=alt.Y('new_cases_forecast', axis=alt.Axis(title=None)),
+        tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
+    ).interactive()
 
+    confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
+        alt.X('index:T'),
+        alt.Y('new_cases_forecast_ll'),
+        alt.Y2('new_cases_forecast_ul')
+    )
+
+
+    st.markdown("### Coronavirus confirmed cases 14 days forecast for {}".format(country))
+    st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
+
+    st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
+        width=650,
+        height=350,
+        title='Coronavirus confirmed cases (7-day rolling mean)'))
+
+    st.markdown('Forecasted daily confirmed cases:')
+    forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
+    st.text(str(forecast14S_l)[1:-1])
+
+
+various(endog_ctry_c, col_c)
+various(endog_ctry_d, col_d)

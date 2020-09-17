@@ -34,7 +34,8 @@ args = parser.parse_args()
 # We filter the country, the variable to predict and the dates
 
 country = args.countryin
-variable = args.varin + '_'
+var = args.varin
+variable = var + '_'
 col = variable + country
 datecol = 'date'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
@@ -151,11 +152,6 @@ print('************* Sarimax model fitted')
 # # Perform/plot in-sample prediction and out-of-sample forecast and evaluate model MAE
 
 in_predictions, mean_forecast = datatools.in_out_fcast_plot(results, test_size, y, y_test, X_train, X_test)
-
-# set title and show plot
-#plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (0-1 scale) for {}'.format(country))
-#plt.savefig(pltpath + 'inoutpred.png')
-#plt.show()
 plt.close()
 
 print('************* In sample and out of sample forecast done')
@@ -185,11 +181,10 @@ plt.plot(testPredictS.index, testPredictS, color='r', label='test predictions')
 
 # Set labels, legends and show plot
 plt.xlabel('Date')
-plt.title('Coronavirus 7-day rolling mean in-sample and test predictions (original scale) for {}'.format(country))
+plt.title('Coronavirus {} 7-day rolling mean in-sample and test predictions (original scale) for {}'.format(var,country))
 plt.rcParams["figure.figsize"] = (20, 8)
 plt.legend()
 plt.savefig(pltpath + 'inoutpredorig.png')
-#plt.show()
 plt.close()
 
 
@@ -200,7 +195,7 @@ print("Test MAE (original scale): %.3f" % mean_absolute_error(covid_ctry_varR[tr
 
 
 # Set model name
-filename = './models/' + country.replace(" ", "") + variable + 'SARIMAXmodel.pkl'
+filename = './models/' + country.replace(" ", "") + '_' + variable + 'model.pkl'
 
 # Pickle it
 #joblib.dump(results, filename)
@@ -221,7 +216,7 @@ print('************* Updated model with test observations')
 
 joblib.dump(res_updated, filename)
 
-print('************* Saved model again, now including test observations')
+print('************* Saved model, including also the test observations')
 
 # # Perform forecast
 
@@ -260,24 +255,6 @@ confidence_intervals = forecast.conf_int()
 lower_limits = confidence_intervals.loc[:,'lower ' + y.name]
 upper_limits = confidence_intervals.loc[:,'upper ' + y.name]
 
-# Print best estimate  predictions
-#print(mean_forecast.values)
-
-# plot the data
-#plt.plot(y.index, y, label='observed')
-
-# plot your mean predictions
-#plt.plot(mean_forecast.index, mean_forecast, color='r', label='forecast')
-
-# shade the area between your confidence limits
-#plt.fill_between(lower_limits.index, lower_limits, upper_limits, color='pink')
-
-# set labels, legends and show plot
-#plt.xlabel('Date')
-#plt.title('Coronavirus 7-day rolling mean forecast')
-#plt.legend()
-#plt.show()
-
 print('************* Done out of sample 14 days forecast')
 
 
@@ -305,7 +282,7 @@ plt.fill_between(forecast14_llS.index, forecast14_llS, forecast14_ulS, color='pi
 
 # set labels, legends and show plot
 plt.xlabel('Date')
-plt.title('Coronavirus (7-day rolling mean) 14 days forecast (original scale) for {}'.format(country))
+plt.title('Coronavirus {} (7-day rolling mean) 14 days forecast (original scale) for {}'.format(var,country))
 plt.legend()
 plt.savefig(pltpath + 'outfcastorig.png')
 #plt.show()

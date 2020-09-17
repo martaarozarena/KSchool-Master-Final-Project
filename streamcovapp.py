@@ -166,9 +166,6 @@ past_plt = alt.Chart(past_rs).mark_line().encode(
     x='date:T',
     y=col,
     tooltip=alt.Tooltip(col, format='.1f')
-).properties(
-    width=700,
-    height=300
 ).interactive()
 
 nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
@@ -179,12 +176,8 @@ nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
 future_rs = forecast14S.to_frame().reset_index()
 future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
     x=alt.X('index:T', axis=alt.Axis(title='Date')),
-    y=alt.Y('new_cases_forecast', axis=alt.Axis(title='Coronavirus confirmed cases'), title='liijl'),
+    y=alt.Y('new_cases_forecast', axis=alt.Axis(title=None)),
     tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
-).properties(
-    width=700,
-    height=300,
-    title='Coronavirus confirmed cases (7-day rolling mean)'
 ).interactive()
 
 confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
@@ -198,9 +191,12 @@ st.markdown("### Coronavirus confirmed cases 14 days forecast for {}".format(cou
 #st.dataframe(future_rs.T)
 st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
 
-st.altair_chart(past_plt + future_plt + nex + confint_plot)
+st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
+    width=650,
+    height=350,
+    title='Coronavirus confirmed cases (7-day rolling mean)'))
 
 st.markdown('Forecasted daily confirmed cases:')
-forecast14S_l = ["%.1f" % elem for elem in forecast14S]
-st.write(str(forecast14S_l)[1:-1])
+forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
+st.text(str(forecast14S_l)[1:-1])
 

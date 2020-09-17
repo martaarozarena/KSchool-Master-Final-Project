@@ -26,6 +26,7 @@ start_time = time.time()
 # Read the coutry from command line:
 parser = argparse.ArgumentParser()
 parser.add_argument('countryin')
+parser.add_argument('varin')
 args = parser.parse_args()
 
 # Read endogenous and exogenous data and filter country/dates
@@ -33,7 +34,7 @@ args = parser.parse_args()
 # We filter the country, the variable to predict and the dates
 
 country = args.countryin
-variable = 'new_cases_'
+variable = args.varin + '_'
 col = variable + country
 datecol = 'date'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
@@ -41,7 +42,7 @@ initialdate = '2020-01-01'   # first day of the year, where most of our data sta
 initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
 enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 
-pltpath = './plots/' + country + '_'
+pltpath = './plots/' + country + '_' + variable + '_'
 
 
 
@@ -192,57 +193,28 @@ plt.savefig(pltpath + 'inoutpredorig.png')
 plt.close()
 
 
-
 print("Test MAE (original scale): %.3f" % mean_absolute_error(covid_ctry_varR[train_size:], testPredictS))
 
 
-# # Save model so we can then update with future values
+# Save model so we can then update with future values
 
 
 # Set model name
-filename = './models/' + country.replace(" ", "") + 'SARIMAXmodel.pkl'
+filename = './models/' + country.replace(" ", "") + variable + 'SARIMAXmodel.pkl'
 
 # Pickle it
-joblib.dump(results, filename)
+#joblib.dump(results, filename)
 
-print('************* Plotted in-sample prediction and saved model')
-
-
-
-# Load the model back in
-#loaded_model = joblib.load(filename)
+print('************* Plotted in-sample prediction')
 
 
-#loaded_model.summary()
-
-
-# # Update model with test observations, to get it ready for future forecasts
-
-
+# Update model with test observations, to get it ready for future forecasts
 
 # Update model with test sample and re-fit parameters:
 res_updated = results.append(y_test, exog=X_test, refit=True)
 
 print('************* Updated model with test observations')
 
-
-
-# Print summary of updated model and plot diagnostics, to confirm everything working as expected:
-#print(res_updated.summary())
-#res_updated.plot_diagnostics(figsize=(15,10));
-
-
-
-# Plot the updated data
-#plt.rcParams["figure.figsize"] = (20, 8)
-#plt.plot(y.index, y, label='observed')
-
-# plot in-sample predictions (train+test)
-#plt.plot(res_updated.fittedvalues.index, res_updated.fittedvalues, color='lightcoral', label= 'updated model')
-#plt.xlabel('Date')
-#plt.title('Coronavirus 7-day rolling mean in-sample predictions (after updating model with test sample)')
-#plt.legend()
-#plt.show()
 
 
 # Save model again, after updating it with test sample:
@@ -252,8 +224,6 @@ joblib.dump(res_updated, filename)
 print('************* Saved model again, now including test observations')
 
 # # Perform forecast
-
-
 
 forecastdays = 14
 new_begin = str(date.fromordinal(datetime.strptime(enddate, '%Y-%m-%d').toordinal() + 1))

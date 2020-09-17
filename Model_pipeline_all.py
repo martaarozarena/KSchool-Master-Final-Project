@@ -7,12 +7,12 @@ import time
 # Initialising time:
 start_time = time.time()
 
-#countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kingdom' \
-#            '|United States|Canada|Mexico' \
-#            '|Australia|Indonesia|Malaysia|Philippines|Thailand|Vietnam|China|India|Japan|Singapore|Taiwan' \
-#            '|Saudi Arabia|United Arab Emirates'
+countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kingdom' \
+            '|United States|Canada|Mexico' \
+            '|Australia|Indonesia|Malaysia|Philippines|Thailand|Vietnam|China|India|Japan|Singapore|Taiwan' \
+            '|Saudi Arabia|United Arab Emirates'
 
-countries = 'Denmark|Germany'
+#countries = 'Denmark|Germany'
 
 variables = ['new_cases', 'new_deaths']
 

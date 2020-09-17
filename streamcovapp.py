@@ -22,8 +22,9 @@ country = st.sidebar.selectbox('', ('Australia','Canada','China','Denmark','Finl
                                     'Italy','Japan','Malaysia','Mexico','Norway','Philippines','Saudi Arabia','Singapore',
                                     'Spain','Sweden','Taiwan','Thailand','United Arab Emirates','United Kingdom','United States','Vietnam'))
 
-var_c = 'new_cases_'
-var_d = 'new_deaths_'
+
+var_c, varc = 'new_cases_', 'cases'
+var_d, vard = 'new_deaths_', 'deaths'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
 # moving intialdate by 6, since we later apply 7-day rolling mean to our data:
 #initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
@@ -56,12 +57,13 @@ last_test_value = int(exog_ctry.iloc[-1, exog_ctry.columns.str.contains('Testing
 last_contact_value = int(exog_ctry.iloc[-1, exog_ctry.columns.str.contains('Testing|Contact')][1])
 
 #@st.cache
-def get_model():
-    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country.replace(" ", "") +'SARIMAXmodel.pkl'
+def get_model(var):
+    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country.replace(" ", "") + '_' + var + 'model.pkl'
     smodel = joblib.load(urllib.request.urlopen(url3))
     return smodel
 
-model_c = get_model()
+model_c = get_model(var_c)
+model_d = get_model(var_d)
 
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = joblib.load(urllib.request.urlopen(url3))
@@ -126,7 +128,7 @@ X_fc = scaled_input_fc
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
-def various(endog_ctry, col, model):
+def various(varx, vary, endog_ctry, col, model):
     # Scaling the endogenous data
     sc_out = MinMaxScaler(feature_range=(0, 1))
     scaled_output = sc_out.fit_transform(endog_ctry)
@@ -137,7 +139,7 @@ def various(endog_ctry, col, model):
     mean_forecast = results.predicted_mean
 
     forecast14 = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
-    forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name='new_cases_forecast')
+    forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name=varx+'forecast')
 
     # Get confidence intervals of  predictions
     confidence_intervals = results.conf_int()
@@ -148,11 +150,11 @@ def various(endog_ctry, col, model):
 
     # Apply inverse transform to get back to original scale
     forecast14_ll = sc_out.inverse_transform(lower_limits.values.reshape(-1,1))
-    forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, name='new_cases_forecast_ll')
+    forecast14_llS = pd.Series(forecast14_ll.flatten(), index=lower_limits.index, name=varx+'forecast_ll')
     fcast_ll_df = forecast14_llS.to_frame().reset_index()
 
     forecast14_ul = sc_out.inverse_transform(upper_limits.values.reshape(-1,1))
-    forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name='new_cases_forecast_ul')
+    forecast14_ulS = pd.Series(forecast14_ul.flatten(), index=upper_limits.index, name=varx+'forecast_ul')
     fcast_ul_df = forecast14_ulS.to_frame().reset_index()
 
     conf_int = pd.concat([fcast_ll_df, fcast_ul_df.iloc[:, 1]], axis=1)
@@ -179,29 +181,29 @@ def various(endog_ctry, col, model):
     future_rs = forecast14S.to_frame().reset_index()
     future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
         x=alt.X('index:T', axis=alt.Axis(title='Date')),
-        y=alt.Y('new_cases_forecast', axis=alt.Axis(title=None)),
-        tooltip=alt.Tooltip('new_cases_forecast', format='.1f')
+        y=alt.Y(varx+'forecast', axis=alt.Axis(title=None)),
+        tooltip=alt.Tooltip(varx+'forecast', format='.1f')
     ).interactive()
 
     confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
         alt.X('index:T'),
-        alt.Y('new_cases_forecast_ll'),
-        alt.Y2('new_cases_forecast_ul')
+        alt.Y(varx+'forecast_ll'),
+        alt.Y2(varx+'forecast_ul')
     )
 
 
-    st.markdown("### Coronavirus confirmed cases 14 days forecast for {}".format(country))
-    st.markdown("Graph shows daily new confirmed cases, showing the past in blue and the forecast in orange:")
+    st.markdown("### Coronavirus confirmed {} 14 days forecast for {}".format(vary, country))
+    st.markdown("Graph shows daily confirmed {}, showing the past in blue and the forecast in orange:".format(vary))
 
     st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
         width=650,
         height=350,
-        title='Coronavirus confirmed cases (7-day rolling mean)'))
+        title='Coronavirus confirmed {} (7-day rolling mean)'.format(vary)))
 
-    st.markdown('Forecasted daily confirmed cases:')
+    st.markdown('Forecasted daily confirmed {}:'.format(vary))
     forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
     st.text(str(forecast14S_l)[1:-1])
 
 
-various(endog_ctry_c, col_c)
-various(endog_ctry_d, col_d)
+various(var_c, varc, endog_ctry_c, col_c, model_c)
+various(var_d, vard, endog_ctry_d, col_d, model_d)

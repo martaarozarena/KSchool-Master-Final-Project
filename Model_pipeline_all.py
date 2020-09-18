@@ -23,7 +23,8 @@ for i in countries.split('|'):
         runtimeone = time.gmtime(time.time() - start_timeone)
         resone = time.strftime('%M:%S', runtimeone)
         print('************* Model for {} in {} created in {} mins/secs'.format(j, i, resone))
-#    print(proc)
+
+#       print(proc)
 
 #    procs.append(proc)
 #    proc.kill()

@@ -188,8 +188,12 @@ plt.savefig(pltpath + 'inoutpredorig.png')
 plt.close()
 
 
-print("Test MAE (original scale): %.3f" % mean_absolute_error(covid_ctry_varR[train_size:], testPredictS))
+mae_orig = mean_absolute_error(covid_ctry_varR[train_size:], testPredictS)
+print("Test MAE (original scale): %.2f" % mae_orig)
 
+maes = open("./models/maes.txt","a")
+maes.write('Test MAE (in original scale) for {} model for {}: {:0.2f}\n'.format(var, country, mae_orig))
+maes.close()
 
 # Save model so we can then update with future values
 

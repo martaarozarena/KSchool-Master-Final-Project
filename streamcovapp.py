@@ -10,10 +10,11 @@ import altair as alt
 
 # Create a title, a header.
 st.markdown("# Coronavirus forecast")
-st.markdown("This is an app for predicting the number of coronavirus cases for the next 14 days, using publicly available data.")
-st.markdown("Please select in the left sidebar the country where you want to make the prediction on. If you don't change anything, \
-            you see the forecast in an scenario where nothing else changes.")
-st.markdown("Then you can play with the 2 values below, to see how modifying certain policies affects the forecast.")
+st.markdown("This is an app for predicting the number of daily new confirmed coronavirus cases and deaths for the next 14 days, \
+            using publicly available data.")
+st.markdown("Please select in the left sidebar the country where you want to make the predictions on. If you don't change anything else, \
+            you see the forecast in a status quo scenario.")
+st.markdown("Then you can play with the 2 values below, to see how modifying certain policies affects the forecasts.")
 #st.markdown("")
 
 # Chooose a country to predict the cases
@@ -128,7 +129,7 @@ X_fc = scaled_input_fc
 #model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
-def various(varx, vary, endog_ctry, col, model):
+def fcast_plot(varx, vary, endog_ctry, col, model):
     # Scaling the endogenous data
     sc_out = MinMaxScaler(feature_range=(0, 1))
     scaled_output = sc_out.fit_transform(endog_ctry)
@@ -198,12 +199,12 @@ def various(varx, vary, endog_ctry, col, model):
     st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
         width=650,
         height=350,
-        title='Coronavirus confirmed {} (7-day rolling mean)'.format(vary)))
+        title='{}: daily new  confirmed coronavirus {} (7-day rolling mean)'.format(country,vary)))
 
     st.markdown('Forecasted daily confirmed {}:'.format(vary))
     forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
     st.text(str(forecast14S_l)[1:-1])
 
 
-various(var_c, varc, endog_ctry_c, col_c, model_c)
-various(var_d, vard, endog_ctry_d, col_d, model_d)
+fcast_plot(var_c, varc, endog_ctry_c, col_c, model_c)
+fcast_plot(var_d, vard, endog_ctry_d, col_d, model_d)

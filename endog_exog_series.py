@@ -20,6 +20,8 @@ countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kin
             '|Australia|Indonesia|Malaysia|Philippines|Thailand|Vietnam|China|India|Japan|Singapore|Taiwan' \
             '|Saudi Arabia|United Arab Emirates'
 
+countriesEU = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kingdom'
+
 # First day of the year, which will be used to set the begin date of the series:
 initialdate = '2020-01-01'   
 
@@ -71,15 +73,23 @@ print('************* Created first set of exog variables: positive rate by count
 
 # Downloading and preparing the Oxford Covid Policy Tracker data
 
-columns = ['Date', 'CountryName', 'RegionName', 'RegionCode', 'C1_School closing', 'C2_Workplace closing', 'C3_Cancel public events', \
-           'C4_Restrictions on gatherings', 'C5_Close public transport', 'C6_Stay at home requirements',  \
+#othercols = ['date', 'countryname', 'regionname', 'regioncode']
+#variables = ['c1_schoolclosing', 'c2_workplaceclosing', 'c3_cancelpublicevents', \
+#           'c4_restrictionsongatherings', 'c5_closepublictransport', 'c6_stayathomerequirements', \
+#           'c7_restrictionsoninternalmovemen', 'c8_internationaltravelcontrols', \
+#           'h1_publicinformationcampaigns', 'h2_testingpolicy', 'h3_contacttracing']
+#columns = othercols + variables
+
+othercols = ['Date', 'CountryName', 'RegionName', 'RegionCode']
+variables = ['C1_School closing', 'C2_Workplace closing', 'C3_Cancel public events', \
+           'C4_Restrictions on gatherings', 'C5_Close public transport', 'C6_Stay at home requirements', \
            'C7_Restrictions on internal movement', 'C8_International travel controls', \
            'H1_Public information campaigns', 'H2_Testing policy', 'H3_Contact tracing']
-variables = ['C1_School closing', 'C2_Workplace closing', 'C3_Cancel public events',  \
-             'C4_Restrictions on gatherings', 'C5_Close public transport', 'C6_Stay at home requirements', \
-             'C7_Restrictions on internal movement', 'C8_International travel controls', \
-             'H1_Public information campaigns', 'H2_Testing policy', 'H3_Contact tracing']
+columns = othercols + variables
 
+#url1 = 'https://github.com/OxCGRT/covid-policy-tracker/raw/master/data/OxCGRT_latest.csv'
+#ox_policy = pd.read_csv(url1, parse_dates=['date'], index_col='date', usecols=columns, dtype={'regionname':str, 'regioncode':str})
+#ox_policy = ox_policy[ox_policy['regioncode'].isna()]
 
 url1 = 'https://github.com/OxCGRT/covid-policy-tracker/raw/master/data/OxCGRT_latest.csv'
 ox_policy = pd.read_csv(url1, parse_dates=['Date'], index_col='Date', usecols=columns, dtype={'RegionName':str, 'RegionCode':str})
@@ -88,6 +98,14 @@ ox_policy = ox_policy[ox_policy['RegionCode'].isna()]
 print('************* Read oxford policy tracker')
 
 ox_ex = pd.DataFrame(index=full_index)
+
+#for i in countries.split('|'):
+#    ox_ctry = ox_policy[ox_policy['countryname']==i].truncate(initialdate, enddate)
+#    for col in variables:
+#        ox_ctry_col = ox_ctry[col]
+#        ox_ctry_col.rename(col+'_{}'.format(i), inplace=True)
+#        ox_ex = pd.concat([ox_ex, ox_ctry_col], axis=1)
+
 
 for i in countries.split('|'):
     ox_ctry = ox_policy[ox_policy['CountryName']==i].truncate(initialdate, enddate)
@@ -141,8 +159,7 @@ print('************* Added mask wearing data to exogenous dataframe')
 
 # Downloading and preparing the Flights data (we only have it available for Europe)
 
-
-# Downloading daily flights from Eurocontrol or alternatively reading it from the drive, since this data only changes once a month
+# Downloading daily flights from Eurocontrol or, alternatively, reading it from the drive, since this data only changes once a month
 
 url3 = 'https://drive.google.com/file/d/1jLzSGGbQY8OyD1YTNZAJFRmvxy7lA2V_/view?usp=sharing'
 path3 = 'https://drive.google.com/uc?export=download&id=' + url3.split('/')[-2]
@@ -152,8 +169,8 @@ flights = pd.read_excel(path3, sheet_name="DATA", date_parser="FLT_DATE", index_
 print('************* Read flights data')
 
 
-# Extracting the number of arrival flights for the selected countries:
-for i in countries.split('|'):
+# Extracting the number of arrival flights for the European selected countries (Eurocontrol data is only for European countries):
+for i in countriesEU.split('|'):
     flights_country = flights[flights["STATE_NAME"]==i]
     flights_country = flights_country.resample("1D").sum()
     flights_country_arr = flights_country['FLT_ARR_1'].truncate(initialdate, enddate)
@@ -166,9 +183,6 @@ for i in countries.split('|'):
 exogenous.loc[:, exogenous.columns.str.contains('flights')] = exogenous.loc[:, exogenous.columns.str.contains('flights')].rolling(7).mean()
 exogenous.loc[:, exogenous.columns.str.contains('flights')] = exogenous.loc[:, exogenous.columns.str.contains('flights')].interpolate(method='linear', limit_direction='both')
 
-
-# We keep the data up to the last European country (which is UK), since this data comes from Eurocontrol, only for European countries:
-exogenous = exogenous.loc[:, :'flightsArr_United Kingdom']
 
 print('************* Added arrival flights data to exogenous dataframe')
 

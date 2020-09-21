@@ -120,8 +120,9 @@ def in_out_fcast_plot(model, steps, endog, endog_test, exog_train, exog_test):
     # Generate forecast for test:
     one_step_forecast = model.get_forecast(steps=steps, exog=exog_test)
     
-    # Extract forecast mean
+    # Extract forecast mean and assign negative values to zero (negative numbers don't make sense here):
     mean_forecast = one_step_forecast.predicted_mean
+    mean_forecast = mean_forecast.clip(lower=0)
     
     # Get confidence intervals of  forecast
     confidence_intervals = one_step_forecast.conf_int()

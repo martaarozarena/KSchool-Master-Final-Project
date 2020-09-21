@@ -1,7 +1,9 @@
 import warnings
 warnings.filterwarnings('ignore')
-from subprocess import run, PIPE, STDOUT
+#from subprocess import run, PIPE, STDOUT
+import pandas as pd
 import time
+import Model_pipeline_one
 #import atexit
 
 # Initialising time:
@@ -16,32 +18,31 @@ countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kin
 
 variables = ['new_cases', 'new_deaths']
 
-for i in countries.split('|'):
-    for j in variables:
+results = []
+
+for ctry in countries.split('|'):
+    for var in variables:
         start_timeone = time.time()
-        proc = run(["python", ".\Model_pipeline_one.py", i, j], stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+        best_order, mae_orig, mae_orig_perc = Model_pipeline_one.create_model(ctry, var)
         runtimeone = time.gmtime(time.time() - start_timeone)
         resone = time.strftime('%M:%S', runtimeone)
-        print('************* Model for {} in {} created in {} mins/secs'.format(j, i, resone))
+        print('************* Model for {} in {} created in {} mins/secs'.format(var, ctry, resone))
+        res = [ctry, var, best_order, round(mae_orig, 1), '{:.2%}'.format(mae_orig_perc)]
+        results.append(res)
+        
+summary = pd.DataFrame(results, columns=['ctry', 'endog', 'order', 'mae', 'mae_perc'])
+summary.to_csv('./models/results.csv')
+
+
+#for i in countries.split('|'):
+#    for j in variables:
+#        start_timeone = time.time()
+#        proc = run(["python", ".\Model_pipeline_one.py", i, j], stdout=PIPE, stderr=STDOUT, universal_newlines=True)
+#        runtimeone = time.gmtime(time.time() - start_timeone)
+#        resone = time.strftime('%M:%S', runtimeone)
+#        print('************* Model for {} in {} created in {} mins/secs'.format(j, i, resone))
 
 #       print(proc)
-
-#    procs.append(proc)
-#    proc.kill()
-#    proc.terminate()
-#    proc = subprocess.Popen(["python", ".\Model_pipeline_one.py", i], stdin=PIPE, stdout=PIPE)
-#    try:
-#        outs, errs = proc.communicate(timeout=50)
-#    except TimeoutExpired:
-#        proc.kill()
-#        outs, errs = proc.communicate()
-
-
-#@atexit.register
-#def kill_subprocesses():
-#    for proc in procs:
-#        proc.kill()
-
 
 runtime = time.gmtime(time.time() - start_time)
 res = time.strftime('%M:%S', runtime)

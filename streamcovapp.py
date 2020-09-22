@@ -9,13 +9,14 @@ from sklearn.preprocessing import MinMaxScaler
 import altair as alt
 
 # Create a title, a header.
-st.markdown("# Coronavirus forecast")
-st.markdown("This is an app for predicting the number of daily new confirmed coronavirus cases and deaths for the next 14 days, \
+st.markdown("# **Coronavirus forecast**")
+st.markdown("")
+st.markdown("This is an app for predicting the number of daily new coronavirus cases and deaths for the next 14 days, \
             using publicly available data.")
 st.markdown("Please select in the left sidebar the country where you want to make the predictions on. If you don't change anything else, \
             you see the forecast in a status quo scenario.")
 st.markdown("Then you can play with the 2 values below, to see how modifying certain policies affects the forecasts.")
-#st.markdown("")
+
 
 # Chooose a country to predict the cases
 st.sidebar.subheader("Select a country")
@@ -27,15 +28,13 @@ country = st.sidebar.selectbox('', ('Australia','Canada','China','Denmark','Finl
 var_c, varc = 'new_cases_', 'cases'
 var_d, vard = 'new_deaths_', 'deaths'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
-# moving intialdate by 6, since we later apply 7-day rolling mean to our data:
-#initialdateshift = str(date.fromordinal(datetime.strptime(initialdate, '%Y-%m-%d').toordinal() + 6)) 
-enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
+#enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 datecol = 'date'
 col_c = var_c + country
 col_d = var_d + country
 
 
-@st.cache
+#@st.cache
 def get_endog(datecol, col):
     url1 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/endogenous.csv'
     covid_ctry_varR = pd.read_csv(url1, parse_dates=[datecol], index_col=[datecol], usecols=[datecol, col])
@@ -44,8 +43,10 @@ def get_endog(datecol, col):
 endog_ctry_c = get_endog(datecol, col_c)
 endog_ctry_d = get_endog(datecol, col_d)
 
+enddate = str(date.fromordinal(endog_ctry_c.tail(1).index[0].toordinal())) # last day of available data
 
-@st.cache
+
+#@st.cache
 def get_exog(datecol, country):
     url2 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/exogenous.csv'
     exog = pd.read_csv(url2, parse_dates=[datecol], index_col=[datecol])
@@ -65,6 +66,12 @@ def get_model(var):
 
 model_c = get_model(var_c)
 model_d = get_model(var_d)
+
+@st.cache
+def get_summary():
+    return pd.read_csv('https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/results.csv', index_col=[0])
+
+summary = get_summary()
 
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = joblib.load(urllib.request.urlopen(url3))
@@ -103,12 +110,17 @@ exog_futur = exog_ctry.reindex(new_index).interpolate()
 
 
 # Change the values introduced by the user in the future exogenous dataframe
-exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H2_Testing policy_{}".format(country)] = 7 * [testing]
-exog_futur.loc[date.fromordinal(date.today().toordinal()+7): ,"H2_Testing policy_{}".format(country)] = 7 * [testing2]
-exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
-exog_futur.loc[date.fromordinal(date.today().toordinal()+7):, "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
+lastplus6 = date.fromordinal(datetime.strptime(new_begin, '%Y-%m-%d').toordinal() + 6)
+lastplus7 = date.fromordinal(datetime.strptime(new_begin, '%Y-%m-%d').toordinal() + 7)
+exog_futur.loc[new_begin:lastplus6 , "H2_Testing policy_{}".format(country)] = 7 * [testing]
+exog_futur.loc[lastplus7: , "H2_Testing policy_{}".format(country)] = 7 * [testing2]
+exog_futur.loc[new_begin:lastplus6 , "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
+exog_futur.loc[lastplus7: , "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
 
-#st.dataframe(exog_futur)
+#exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H2_Testing policy_{}".format(country)] = 7 * [testing]
+#exog_futur.loc[date.fromordinal(date.today().toordinal()+7): ,"H2_Testing policy_{}".format(country)] = 7 * [testing2]
+#exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
+#exog_futur.loc[date.fromordinal(date.today().toordinal()+7):, "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
 
 
 # Re-scale exogenous data with new added days:
@@ -141,6 +153,7 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
 
     forecast14 = sc_out.inverse_transform(mean_forecast.values.reshape(-1,1))
     forecast14S = pd.Series(forecast14.flatten(), index=mean_forecast.index, name=varx+'forecast')
+    forecast14S = forecast14S.clip(lower=0)
 
     # Get confidence intervals of  predictions
     confidence_intervals = results.conf_int()
@@ -165,13 +178,15 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
     first_fut.columns = [endog_ctry.columns[0]]
     nexus = pd.concat([last_endog, first_fut]).reset_index()
 
+    maes = summary.loc[(summary.ctry==country) & (summary.endog.str.contains(vary)), 'mae'].array[0]
+    text = 'Test MAE (mean absolute error): {}'.format(maes)
 
     # Build dataframe for Altair graph
     past_rs = endog_ctry.reset_index()
     past_plt = alt.Chart(past_rs).mark_line().encode(
         x='date:T',
         y=col,
-        tooltip=alt.Tooltip(col, format='.1f')
+        tooltip=alt.Tooltip(['date',col])
     ).interactive()
 
     nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
@@ -181,9 +196,9 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
 
     future_rs = forecast14S.to_frame().reset_index()
     future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
-        x=alt.X('index:T', axis=alt.Axis(title='Date')),
+        x=alt.X('index:T', axis=alt.Axis(title=text)),
         y=alt.Y(varx+'forecast', axis=alt.Axis(title=None)),
-        tooltip=alt.Tooltip(varx+'forecast', format='.1f')
+        tooltip=alt.Tooltip(['index', varx+'forecast'])
     ).interactive()
 
     confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
@@ -193,15 +208,25 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
     )
 
 
-    st.markdown("### Coronavirus confirmed {} 14 days forecast for {}".format(vary, country))
+    st.markdown("## **Coronavirus {} 14 days forecast for {}**".format(vary, country))
     st.markdown("Graph shows daily confirmed {}, showing the past in blue and the forecast in orange:".format(vary))
+    st.markdown("")
 
     st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
         width=650,
         height=350,
-        title='{}: daily new  confirmed coronavirus {} (7-day rolling mean)'.format(country,vary)))
+        title='{}: daily new  confirmed coronavirus {} (7-day rolling mean)'.format(country,vary)
+    ))
 
-    st.markdown('Forecasted daily confirmed {}:'.format(vary))
+#    st.markdown('<div align="right">Test MAE: {}.format()</div>', unsafe_allow_html=True)
+#    text = 'Test MAE: {}'.format(enddate)
+#    st.markdown(text.rjust(95, "\t"))
+
+#    st.dataframe(summary)
+#    st.markdown('<div align="right">'text'</div>', unsafe_allow_html=True)
+#    st.markdown(text)
+    st.markdown("")
+    st.markdown('Forecasted daily {}, from {} onwards:'.format(vary, new_begin))
     forecast14S_l = [ " %.0f" % elem for elem in forecast14S]
     st.text(str(forecast14S_l)[1:-1])
 

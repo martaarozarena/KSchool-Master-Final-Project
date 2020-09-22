@@ -67,8 +67,11 @@ def get_model(var):
 model_c = get_model(var_c)
 model_d = get_model(var_d)
 
+@st.cache
+def get_summary():
+    return pd.read_csv('https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/results.csv', index_col=[0])
 
-summary = pd.read_csv('./results20200921.csv', index_col=[0])
+summary = get_summary()
 
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = joblib.load(urllib.request.urlopen(url3))

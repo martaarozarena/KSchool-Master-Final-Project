@@ -85,10 +85,14 @@ def autoarimas(endog_series, exog_series):
 
 
 def cross_val(endog_series, exog_series, model1, model2, model3):
-    cv = model_selection.SlidingWindowForecastCV(window_size=100, step=10, h=15)
+    cv = model_selection.RollingForecastCV(step=5, h=14, initial=160)
     model1_cv_scores = model_selection.cross_val_score(model1, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
     model2_cv_scores = model_selection.cross_val_score(model2, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
     model3_cv_scores = model_selection.cross_val_score(model3, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
+    
+    model1_cv_scores = model1_cv_scores[~(np.isnan(model1_cv_scores))]
+    model2_cv_scores = model2_cv_scores[~(np.isnan(model2_cv_scores))]
+    model3_cv_scores = model3_cv_scores[~(np.isnan(model3_cv_scores))]
     
     model1_cv_scoreslist = ["%.4f" % elem for elem in model1_cv_scores]
     model2_cv_scoreslist = ["%.4f" % elem for elem in model2_cv_scores]

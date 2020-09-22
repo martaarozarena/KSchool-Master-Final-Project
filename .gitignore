@@ -5,5 +5,5 @@ models_old/
 __pycache__/
 *.docx
 *.pptx
-*.csv
 *.xlsx
+*.txt

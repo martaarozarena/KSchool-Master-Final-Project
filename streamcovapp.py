@@ -9,13 +9,14 @@ from sklearn.preprocessing import MinMaxScaler
 import altair as alt
 
 # Create a title, a header.
-st.markdown("# Coronavirus forecast")
+st.markdown("# **Coronavirus forecast**")
+st.markdown("")
 st.markdown("This is an app for predicting the number of daily new coronavirus cases and deaths for the next 14 days, \
             using publicly available data.")
 st.markdown("Please select in the left sidebar the country where you want to make the predictions on. If you don't change anything else, \
             you see the forecast in a status quo scenario.")
 st.markdown("Then you can play with the 2 values below, to see how modifying certain policies affects the forecasts.")
-#st.markdown("")
+
 
 # Chooose a country to predict the cases
 st.sidebar.subheader("Select a country")
@@ -65,6 +66,9 @@ def get_model(var):
 
 model_c = get_model(var_c)
 model_d = get_model(var_d)
+
+
+summary = pd.read_csv('./results20200921.csv', index_col=[0])
 
 #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
 #model = joblib.load(urllib.request.urlopen(url3))
@@ -171,13 +175,15 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
     first_fut.columns = [endog_ctry.columns[0]]
     nexus = pd.concat([last_endog, first_fut]).reset_index()
 
+    maes = summary.loc[(summary.ctry==country) & (summary.endog.str.contains(vary)), 'mae'].array[0]
+    text = 'Test MAE (mean absolute error): {}'.format(maes)
 
     # Build dataframe for Altair graph
     past_rs = endog_ctry.reset_index()
     past_plt = alt.Chart(past_rs).mark_line().encode(
         x='date:T',
         y=col,
-        tooltip=alt.Tooltip(col, format='.1f')
+        tooltip=alt.Tooltip(['date',col])
     ).interactive()
 
     nex = alt.Chart(nexus).mark_line(opacity=0.5, size=1.2).encode(
@@ -187,9 +193,9 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
 
     future_rs = forecast14S.to_frame().reset_index()
     future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
-        x=alt.X('index:T', axis=alt.Axis(title='Date')),
+        x=alt.X('index:T', axis=alt.Axis(title=text)),
         y=alt.Y(varx+'forecast', axis=alt.Axis(title=None)),
-        tooltip=alt.Tooltip(varx+'forecast', format='.1f')
+        tooltip=alt.Tooltip(['index', varx+'forecast'])
     ).interactive()
 
     confint_plot = alt.Chart(conf_int).mark_area(opacity=0.2, color='orange').encode(
@@ -199,18 +205,23 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
     )
 
 
-    st.markdown("### Coronavirus {} 14 days forecast for {}".format(vary, country))
+    st.markdown("## **Coronavirus {} 14 days forecast for {}**".format(vary, country))
     st.markdown("Graph shows daily confirmed {}, showing the past in blue and the forecast in orange:".format(vary))
+    st.markdown("")
 
     st.altair_chart((past_plt + future_plt + nex + confint_plot).properties(
         width=650,
         height=350,
-        title='{}: daily new  confirmed coronavirus {} (7-day rolling mean)'.format(country,vary)))
+        title='{}: daily new  confirmed coronavirus {} (7-day rolling mean)'.format(country,vary)
+    ))
 
 #    st.markdown('<div align="right">Test MAE: {}.format()</div>', unsafe_allow_html=True)
 #    text = 'Test MAE: {}'.format(enddate)
-#    st.markdown(text.rjust(95, " "))
-    st.markdown('###### Test MAE (mean absolute error): {}'.format(enddate))
+#    st.markdown(text.rjust(95, "\t"))
+
+#    st.dataframe(summary)
+#    st.markdown('<div align="right">'text'</div>', unsafe_allow_html=True)
+#    st.markdown(text)
     st.markdown("")
     st.markdown('Forecasted daily {}, from {} onwards:'.format(vary, new_begin))
     forecast14S_l = [ " %.0f" % elem for elem in forecast14S]

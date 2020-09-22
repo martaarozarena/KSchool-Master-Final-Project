@@ -31,7 +31,7 @@ for ctry in countries.split('|'):
         results.append(res)
         
 summary = pd.DataFrame(results, columns=['ctry', 'endog', 'order', 'mae', 'mae_perc'])
-summary.to_csv('./models/results.csv')
+summary.to_csv('./results.csv')
 
 
 #for i in countries.split('|'):

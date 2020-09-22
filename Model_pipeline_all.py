@@ -27,8 +27,8 @@ for ctry in countries.split('|'):
         runtimeone = time.gmtime(time.time() - start_timeone)
         resone = time.strftime('%M:%S', runtimeone)
         print('************* Model for {} in {} created in {} mins/secs'.format(var, ctry, resone))
-        res = [ctry, var, best_order, round(mae_orig, 1), '{:.2%}'.format(mae_orig_perc)]
-        results.append(res)
+        resctry = [ctry, var, best_order, round(mae_orig, 1), '{:.2%}'.format(mae_orig_perc)]
+        results.append(resctry)
         
 summary = pd.DataFrame(results, columns=['ctry', 'endog', 'order', 'mae', 'mae_perc'])
 summary.to_csv('./results.csv')
@@ -45,5 +45,5 @@ summary.to_csv('./results.csv')
 #       print(proc)
 
 runtime = time.gmtime(time.time() - start_time)
-res = time.strftime('%M:%S', runtime)
-print('************* All models created in {} mins/secs'.format(res))
+res = time.strftime('%H:%M:%S', runtime)
+print('************* All models created in {} hours/mins/secs'.format(res))

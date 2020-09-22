@@ -90,10 +90,12 @@ def cross_val(endog_series, exog_series, model1, model2, model3):
     model2_cv_scores = model_selection.cross_val_score(model2, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
     model3_cv_scores = model_selection.cross_val_score(model3, y=endog_series, exogenous=exog_series, scoring='mean_absolute_error', cv=cv)
     
+    # Filter the nan scores
     model1_cv_scores = model1_cv_scores[~(np.isnan(model1_cv_scores))]
     model2_cv_scores = model2_cv_scores[~(np.isnan(model2_cv_scores))]
     model3_cv_scores = model3_cv_scores[~(np.isnan(model3_cv_scores))]
     
+    # Print score list for each model
     model1_cv_scoreslist = ["%.4f" % elem for elem in model1_cv_scores]
     model2_cv_scoreslist = ["%.4f" % elem for elem in model2_cv_scores]
     model3_cv_scoreslist = ["%.4f" % elem for elem in model3_cv_scores]
@@ -108,8 +110,8 @@ def cross_val(endog_series, exog_series, model1, model2, model3):
     errors = [m1_average_error, m2_average_error, m3_average_error]
     models = [model1, model2, model3]
 
-    # print out the answer
-    better_index = np.argmin(errors)
+    # Print out the best model (where errors is min, discarding nan values):
+    better_index = errors.index(np.nanmin(errors))
     best_order = models[better_index].order
     print("Lowest average MAE: {} (model{})".format(errors[better_index], better_index + 1))
     print("Best model order: {}".format(best_order))

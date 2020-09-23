@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import warnings
 warnings.filterwarnings('ignore')
 #from subprocess import run, PIPE, STDOUT

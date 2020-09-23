@@ -10,11 +10,29 @@ This tool is not intended for professional use - it is the result of a Data Scie
   * OurWorldInData.org (https://ourworldindata.org/coronavirus): daily numbers of coronavirus cases and deaths by country form the `endogenous` dataset. The daily positive rate by country is part of the `exogenous` dataset.
   * Oxford Covid-19 Government Response Tracker (OxCGRT) (https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker): collects systematic information on which governments have taken which measures, and when. 11 of these country level policies have been integrated into the `exogenous` dataset.
   * YouGov Covid 19 Behaviour Tracker (https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): percentage of people who say they are wearing a face mask when in public places in each country. This data is included in the `exogenous` dataset, at country level.
-  * Eurocontrol airport traffic dataset (https://ansperformance.eu/covid/): the number of daily arrivals by country is included in the `exogenous` dataset.
+  * Eurocontrol airport traffic dataset (https://ansperformance.eu/covid/): the number of daily arrivals by country (only for European countries) is included in the `exogenous` dataset.
 * Data cleaning:
 * Data exploration:
 * Modeling:
 * Visualisation: 
+
+
+## Libraries to install
+
+
+## Folder creation
+
+
+## Notebooks
+
+
+## Running .py files
+
+
+## Visualising front end
+
+
+
 
 
 

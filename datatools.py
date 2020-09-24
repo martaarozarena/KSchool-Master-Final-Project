@@ -111,7 +111,11 @@ def cross_val(endog_series, exog_series, model1, model2, model3):
     models = [model1, model2, model3]
 
     # Print out the best model (where errors is min, discarding nan values):
-    better_index = errors.index(np.nanmin(errors))
+    if np.isnan(np.nanmin(errors)):
+        better_index = 0
+    else:
+        better_index = errors.index(np.nanmin(errors))
+    
     best_order = models[better_index].order
     print("Lowest average MAE: {} (model{})".format(errors[better_index], better_index + 1))
     print("Best model order: {}".format(best_order))

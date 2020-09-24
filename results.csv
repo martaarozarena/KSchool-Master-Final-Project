@@ -1,51 +1,51 @@
 ,ctry,endog,order,mae,mae_perc
-0,Denmark,new_cases,"(2, 2, 2)",119.5,68.99%
-1,Denmark,new_deaths,"(4, 2, 0)",1.9,460.30%
-2,Germany,new_cases,"(0, 1, 0)",740.8,57.16%
-3,Germany,new_deaths,"(1, 1, 2)",3.9,85.75%
-4,Spain,new_cases,"(3, 1, 0)",2596.8,32.26%
-5,Spain,new_deaths,"(2, 1, 1)",29.0,58.62%
-6,Finland,new_cases,"(2, 1, 0)",6.8,21.35%
-7,Finland,new_deaths,"(1, 2, 4)",0.2,97.94%
-8,Italy,new_cases,"(5, 1, 0)",539.4,48.69%
-9,Italy,new_deaths,"(1, 1, 1)",7.3,61.67%
-10,Sweden,new_cases,"(5, 1, 0)",159.5,68.76%
-11,Sweden,new_deaths,"(0, 1, 4)",1.7,88.28%
-12,France,new_cases,"(0, 1, 4)",3777.7,66.31%
-13,France,new_deaths,"(8, 1, 0)",21.2,100.00%
-14,Norway,new_cases,"(2, 1, 0)",56.0,74.25%
-15,Norway,new_deaths,"(5, 1, 4)",0.3,105.59%
-16,United Kingdom,new_cases,"(4, 1, 1)",783.3,41.59%
-17,United Kingdom,new_deaths,"(1, 2, 4)",67.7,612.29%
-18,United States,new_cases,"(4, 2, 0)",4209.0,10.02%
-19,United States,new_deaths,"(0, 1, 5)",55.8,6.33%
-20,Canada,new_cases,"(0, 1, 5)",131.6,23.68%
-21,Canada,new_deaths,"(4, 1, 7)",6.9,123.48%
-22,Mexico,new_cases,"(1, 1, 0)",397.8,7.64%
-23,Mexico,new_deaths,"(0, 1, 5)",151.3,29.98%
-24,Australia,new_cases,"(1, 1, 4)",219.4,150.79%
-25,Australia,new_deaths,"(1, 1, 4)",6.1,45.20%
-26,Indonesia,new_cases,"(1, 1, 0)",806.9,28.89%
-27,Indonesia,new_deaths,"(0, 1, 5)",32.2,35.66%
-28,Malaysia,new_cases,"(0, 1, 0)",16.7,64.07%
-29,Malaysia,new_deaths,"(1, 1, 4)",0.1,133.68%
-30,Philippines,new_cases,"(2, 1, 0)",1266.2,34.10%
-31,Philippines,new_deaths,"(0, 1, 0)",15.1,23.39%
-32,Thailand,new_cases,"(2, 1, 0)",31.3,842.37%
+0,Denmark,new_cases,"(2, 2, 2)",133.8,73.62%
+1,Denmark,new_deaths,"(0, 1, 4)",4.7,1078.87%
+2,Germany,new_cases,"(0, 1, 0)",765.5,58.56%
+3,Germany,new_deaths,"(1, 1, 2)",4.2,90.85%
+4,Spain,new_cases,"(3, 1, 0)",2641.6,32.49%
+5,Spain,new_deaths,"(2, 1, 1)",29.4,57.70%
+6,Finland,new_cases,"(2, 1, 0)",7.3,22.05%
+7,Finland,new_deaths,"(0, 1, 5)",0.2,91.50%
+8,Italy,new_cases,"(5, 1, 0)",508.2,45.42%
+9,Italy,new_deaths,"(1, 1, 1)",6.9,57.93%
+10,Sweden,new_cases,"(5, 1, 0)",159.9,68.40%
+11,Sweden,new_deaths,"(1, 1, 0)",0.9,44.03%
+12,France,new_cases,"(0, 1, 4)",3944.1,67.86%
+13,France,new_deaths,"(8, 1, 0)",22.1,100.00%
+14,Norway,new_cases,"(2, 1, 0)",57.1,75.09%
+15,Norway,new_deaths,"(5, 1, 0)",0.3,100.00%
+16,United Kingdom,new_cases,"(2, 1, 1)",833.6,42.98%
+17,United Kingdom,new_deaths,"(1, 2, 4)",78.6,692.21%
+18,United States,new_cases,"(4, 2, 0)",4222.3,10.05%
+19,United States,new_deaths,"(0, 1, 5)",56.1,6.40%
+20,Canada,new_cases,"(0, 1, 5)",141.7,24.88%
+21,Canada,new_deaths,"(4, 1, 7)",6.9,122.87%
+22,Mexico,new_cases,"(1, 1, 0)",426.4,8.23%
+23,Mexico,new_deaths,"(0, 1, 5)",150.4,29.97%
+24,Australia,new_cases,"(1, 1, 4)",220.5,154.59%
+25,Australia,new_deaths,"(1, 1, 4)",6.2,47.06%
+26,Indonesia,new_cases,"(1, 1, 0)",840.7,29.79%
+27,Indonesia,new_deaths,"(0, 1, 5)",33.2,36.36%
+28,Malaysia,new_cases,"(2, 1, 2)",17.6,65.55%
+29,Malaysia,new_deaths,"(1, 1, 4)",0.1,121.86%
+30,Philippines,new_cases,"(0, 1, 5)",823.2,22.25%
+31,Philippines,new_deaths,"(0, 1, 0)",15.2,23.55%
+32,Thailand,new_cases,"(1, 1, 4)",23.0,618.09%
 33,Thailand,new_deaths,"(0, 1, 0)",0.0,100.00%
-34,Vietnam,new_cases,"(0, 2, 5)",16.6,277.00%
-35,Vietnam,new_deaths,"(5, 2, 4)",1.9,346.43%
-36,China,new_cases,"(2, 2, 3)",56.8,147.78%
-37,China,new_deaths,"(1, 1, 2)",0.8,65.81%
-38,India,new_cases,"(5, 2, 0)",9461.2,12.25%
-39,India,new_deaths,"(0, 1, 0)",152.5,14.80%
-40,Japan,new_cases,"(5, 1, 0)",82.3,10.80%
-41,Japan,new_deaths,"(0, 2, 1)",4.9,44.36%
-42,Singapore,new_cases,"(0, 1, 5)",43.2,69.63%
-43,Singapore,new_deaths,"(2, 1, 1)",0.0,nan%
-44,Taiwan,new_cases,"(0, 1, 5)",0.4,55.86%
+34,Vietnam,new_cases,"(0, 2, 5)",18.3,311.93%
+35,Vietnam,new_deaths,"(3, 1, 2)",0.8,155.23%
+36,China,new_cases,"(2, 2, 3)",65.2,171.43%
+37,China,new_deaths,"(7, 2, 1)",4.9,404.68%
+38,India,new_cases,"(5, 2, 0)",9803.8,12.64%
+39,India,new_deaths,"(0, 1, 0)",154.5,14.95%
+40,Japan,new_cases,"(5, 1, 0)",85.8,11.35%
+41,Japan,new_deaths,"(0, 2, 1)",5.3,48.48%
+42,Singapore,new_cases,"(0, 1, 5)",48.9,79.98%
+43,Singapore,new_deaths,"(3, 1, 3)",0.0,nan%
+44,Taiwan,new_cases,"(0, 1, 5)",0.4,54.09%
 45,Taiwan,new_deaths,"(0, 1, 5)",0.0,inf%
-46,Saudi Arabia,new_cases,"(3, 1, 4)",486.6,48.63%
-47,Saudi Arabia,new_deaths,"(3, 1, 0)",3.1,9.88%
-48,United Arab Emirates,new_cases,"(2, 1, 0)",251.0,48.18%
-49,United Arab Emirates,new_deaths,"(2, 1, 1)",1.1,95.25%
+46,Saudi Arabia,new_cases,"(1, 1, 4)",486.8,49.18%
+47,Saudi Arabia,new_deaths,"(3, 1, 0)",3.2,10.05%
+48,United Arab Emirates,new_cases,"(2, 1, 0)",256.8,48.68%
+49,United Arab Emirates,new_deaths,"(0, 1, 5)",1.1,98.90%

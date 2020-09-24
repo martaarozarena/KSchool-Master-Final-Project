@@ -18,24 +18,8 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 from sklearn.preprocessing import MinMaxScaler
 import joblib
 import datatools
-import argparse
 import time
 
-# Initialising time:
-#start_time = time.time()
-
-# Read the coutry from command line:
-#parser = argparse.ArgumentParser()
-#parser.add_argument('countryin')
-#parser.add_argument('varin')
-#args = parser.parse_args()
-
-# Read endogenous and exogenous data and filter country/dates
-
-# We filter the country, the variable to predict and the dates
-
-#country = args.countryin
-#var = args.varin
 
 def create_model(countryin, varin):
     country = countryin
@@ -126,8 +110,7 @@ def create_model(countryin, varin):
 
     best_model = sm.tsa.statespace.SARIMAX(y_train, order=best_order, exog=X_train)
     results = best_model.fit(full_output=False, disp=False)
-    #print(results.summary())
-    #results.plot_diagnostics(figsize=(15,10));
+
 
     print('************* Sarimax model fitted')
 
@@ -175,10 +158,6 @@ def create_model(countryin, varin):
     plt.savefig(pltpath + 'inoutpredorig.png')
     plt.close()
 
-
-#    maes = open("./models/maes.txt","a")
-#    maes.write('Test MAE (in original scale) for {} model for {}: {:0.1f}\n'.format(var, country, mae_orig))
-#    maes.close()
     
 
     print('************* Plotted in-sample prediction')
@@ -272,7 +251,6 @@ def create_model(countryin, varin):
     plt.text(0.82, 0.17, 'Test MAE: {:.1f}'.format(mae_orig), transform = plt.gcf().transFigure, fontsize=13)
     plt.legend()
     plt.savefig(pltpath + 'outfcastorig.png')
-    #plt.show()
     plt.close()
 
     print('************* Plotted 14 days forecast in original scale')
@@ -283,9 +261,6 @@ def create_model(countryin, varin):
     forecast14S_l = ["%.1f" % elem for elem in forecast14S]
     print('Next 14 days forecast values: ', forecast14S_l)
 
-#    runtime = time.gmtime(time.time() - start_time)
-#    res = time.strftime('%M:%S', runtime)
-#    print("Took {} mins/secs to create the {} model for {}".format(res, var, country))
     
     return best_order, mae_orig, mae_orig_perc
 

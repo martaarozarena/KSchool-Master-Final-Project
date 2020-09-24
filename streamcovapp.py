@@ -28,15 +28,15 @@ country = st.sidebar.selectbox('', ('Australia','Canada','China','Denmark','Finl
 var_c, varc = 'new_cases_', 'cases'
 var_d, vard = 'new_deaths_', 'deaths'
 initialdate = '2020-01-01'   # first day of the year, where most of our data starts
-#enddate = str(date.fromordinal(date.today().toordinal()-1))   # yesterday's date: last day of available data
 datecol = 'date'
 col_c = var_c + country
 col_d = var_d + country
 
 
-@st.cache
+#@st.cache
 def get_endog(datecol, col):
-    url1 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/endogenous.csv'
+    url1 = './data/endogenous.csv'
+    #url1 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/endogenous.csv'
     covid_ctry_varR = pd.read_csv(url1, parse_dates=[datecol], index_col=[datecol], usecols=[datecol, col])
     return covid_ctry_varR
 
@@ -48,7 +48,8 @@ enddate = str(date.fromordinal(endog_ctry_c.tail(1).index[0].toordinal())) # las
 
 #@st.cache
 def get_exog(datecol, country):
-    url2 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/exogenous.csv'
+    url2 = './data/exogenous.csv'
+    #url2 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/exogenous.csv'
     exog = pd.read_csv(url2, parse_dates=[datecol], index_col=[datecol])
     exog = exog.loc[:, exog.columns.str.contains(country)]
     return exog
@@ -60,30 +61,23 @@ last_contact_value = int(exog_ctry.iloc[-1, exog_ctry.columns.str.contains('Test
 
 #@st.cache
 def get_model(var):
-    url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country.replace(" ", "") + '_' + var + 'model.pkl'
-    smodel = joblib.load(urllib.request.urlopen(url3))
+    url3 = './models/' + country.replace(" ", "") + '_' + var + 'model.pkl'
+    smodel = joblib.load(url3)
+    #url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country.replace(" ", "") + '_' + var + 'model.pkl'
+    #smodel = joblib.load(urllib.request.urlopen(url3))
     return smodel
 
 model_c = get_model(var_c)
 model_d = get_model(var_d)
 
-@st.cache
+#@st.cache
 def get_summary():
-    return pd.read_csv('https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/results.csv', index_col=[0])
+    url4 = './results.csv'
+    #url4 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/results.csv'
+    summa = pd.read_csv(url4, index_col=[0])
+    return summa
 
 summary = get_summary()
-
-#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
-#model = joblib.load(urllib.request.urlopen(url3))
-
-#Load the country model and make the predictions
-#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
-#model = pd.read_pickle(url3)
-#model = joblib.load(urllib.request.urlopen(url3))
-#model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
-#model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
-#model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
-
 
 
 # Select the values of the 2 diferent variables
@@ -117,28 +111,12 @@ exog_futur.loc[lastplus7: , "H2_Testing policy_{}".format(country)] = 7 * [testi
 exog_futur.loc[new_begin:lastplus6 , "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
 exog_futur.loc[lastplus7: , "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
 
-#exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H2_Testing policy_{}".format(country)] = 7 * [testing]
-#exog_futur.loc[date.fromordinal(date.today().toordinal()+7): ,"H2_Testing policy_{}".format(country)] = 7 * [testing2]
-#exog_futur.loc[date.today():date.fromordinal(date.today().toordinal()+6), "H3_Contact tracing_{}".format(country)] = 7 * [tracing]
-#exog_futur.loc[date.fromordinal(date.today().toordinal()+7):, "H3_Contact tracing_{}".format(country)] = 7 * [tracing2]
-
 
 # Re-scale exogenous data with new added days:
-
 sc_in_fc = MinMaxScaler(feature_range=(0, 1))
 scaled_input_fc = sc_in_fc.fit_transform(exog_futur)
 scaled_input_fc = pd.DataFrame(scaled_input_fc, index=exog_futur.index, columns=exog_futur.columns)
 X_fc = scaled_input_fc
-#st.line_chart(X_fc)
-
-
-#Load the country model and make the predictions
-#url3 = 'https://github.com/martaarozarena/KSchool-Master-Final-Project/raw/master/models/' + country +'SARIMAXmodel.pkl'
-#model = pd.read_pickle(url3)
-#model = joblib.load(urllib.request.urlopen(url3))
-#model = joblib.load(urllib.request.urlopen("https://github.com/hnballes/exogenas/raw/master/SpainSARIMAXmodel%20(copy%201).pkl"))
-#model = joblib.load("/home/dsc/proyecto/data/{}SARIMAXmodel.pkl".format(country))
-#model = joblib.load("/home/dsc/proyecto/data/SpainSARIMAXmodel.pkl")
 
 
 def fcast_plot(varx, vary, endog_ctry, col, model):

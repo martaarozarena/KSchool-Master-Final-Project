@@ -78,7 +78,7 @@ streamlit run .\streamcovapp.py
 ```
 If there is any problem when running the two python commands in the previous section, the necessary files for visualising the front end are currently saved in GitHub as a back up plan. In order to run the streamlit file from GitHub back up files, please edit `streamcovapp.py` and look for `url1`, `url2`, `url3` and `url4`. Below these variables, you will find the GitHub urls which need to be uncommented and hence comment the local paths accordingly.  
 
-In addition, front end is also available through a public url that is being run in `Google Cloud` engine. To access it, please click in the following link [Live demo](http://34.78.90.249:8501/)
+In addition, front end is also available through a public url that is being run in `Google Cloud` engine. To access it, please click in the following link: [Live demo](http://34.78.90.249:8501/)
 
 
 <br/><br/>

@@ -23,11 +23,10 @@ from sklearn.preprocessing import MinMaxScaler
 import joblib
 
 
-# In[23]:
-
-
-
-countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kingdom'             '|United States|Canada|Mexico'             '|Australia|Indonesia|Malaysia|Philippines|Thailand|Vietnam|China|India|Japan|Singapore|Taiwan'             '|Saudi Arabia|United Arab Emirates'
+countries = 'Denmark|Germany|Spain|Finland|Italy|Sweden|France|Norway|United Kingdom' \
+            '|United States|Canada|Mexico' \
+            '|Australia|Indonesia|Malaysia|Philippines|Thailand|Vietnam|China|India|Japan|Singapore|Taiwan' \
+            '|Saudi Arabia|United Arab Emirates'
 
 datecol = 'date'
 exog=pd.read_csv("data/exogenous.csv", parse_dates=[datecol], index_col=[datecol])
@@ -37,29 +36,36 @@ cases="cases"
 for cases in ["cases","deaths"]:
 
     for exogcountries in countries.split('|'):
+        
+        #create a variable without space for the models
         country=exogcountries.replace(" ","")
-        #filename = './models/' + country + 'SARIMAXmodel.pkl'
         filename = './models/' + country + '_new_'+cases+'_model.pkl'
         model = joblib.load(filename)
+        
+        #check if its already updated otherwise, update it
         if model.fittedvalues.index[-1]== exog.index[-1]:
             print("up to date")
         else:
 
+            #look for the country variables
             exogmodel=exog.loc[:, exog.columns.str.contains(exogcountries)]
             endogmodel=endog.loc[:, endog.columns.str.contains("new_{}_{}".format(cases,exogcountries))]
-            #exogmodel=exogmodel.iloc[-1:,:]
+            
+            #normalize exog variables
             sc_in = MinMaxScaler(feature_range=(0, 1))
             scaled_input = sc_in.fit_transform(exogmodel)
             scaled_input = pd.DataFrame(scaled_input, index=exogmodel.index, columns=exogmodel.columns)
             X_update = scaled_input
             X_update=X_update.iloc[-1:,:]
 
+            #normalice endog variables
             sc_out = MinMaxScaler(feature_range=(0, 1))
             scaled_output = sc_out.fit_transform(endogmodel)
             scaled_output  = pd.Series(scaled_output.flatten(), index=endogmodel.index, name=endogmodel.columns[0])
             y = scaled_output.resample('1D').sum()
             y=y.iloc[-1:]
+            
+            #update model
             modelupdated=model.append(y, exog=X_update, refit=True,)
             joblib.dump(modelupdated, filename)
             print("{} new_{} updated".format(country,cases))
-

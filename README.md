@@ -1,10 +1,8 @@
 # Coronavirus forecast around the world
 
-**Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors.
-
 This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.
 
-This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
+**Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors. This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
 
 * **Data acquisition**: data is downloaded from various open data sources (cited at the end of this `readme`) and saved in the two main csvs used in this project - `endogenous.csv` and `exogenous.csv`. Data sources:
   * OurWorldInData.org (https://ourworldindata.org/coronavirus): daily numbers of coronavirus cases and deaths by country form the `endogenous` dataset. The daily positive rate by country is part of the `exogenous` dataset.

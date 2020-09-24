@@ -6,7 +6,7 @@ This project predicts coronavirus cases and deaths in 25 selected countries arou
 
 This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
 
-* **Data acquisition**: data is downloaded from various open data sources (cited at the end of this `readme`) and saved in the two main csvs used for this project - `endogenous.csv` and `exogenous.csv`
+* **Data acquisition**: data is downloaded from various open data sources (cited at the end of this `readme`) and saved in the two main csvs used in this project - `endogenous.csv` and `exogenous.csv`. Data sources:
   * OurWorldInData.org (https://ourworldindata.org/coronavirus): daily numbers of coronavirus cases and deaths by country form the `endogenous` dataset. The daily positive rate by country is part of the `exogenous` dataset.
   * Oxford Covid-19 Government Response Tracker (OxCGRT) (https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker): collects systematic information on which governments have taken which measures, and when. 11 of these country level policies have been integrated into the `exogenous` dataset.
   * YouGov Covid 19 Behaviour Tracker (https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): percentage of people who say they are wearing a face mask when in public places in each country. This data is included in the `exogenous` dataset, at country level.

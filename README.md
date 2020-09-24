@@ -2,7 +2,7 @@
 
 **Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors.
 
-This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update models with last observed date.
+This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.
 
 This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
 
@@ -18,7 +18,7 @@ This tool is not intended for professional use - it is the result of a Data Scie
 * **Deployment**: using `Google Cloud` compute engine, which also runs daily scripts to update data and models with last observed date. Public url: [Live demo](http://34.78.90.249:8501/)
 
 ## Notebooks and .py files description
-For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the following section).
+For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the sections below).
 
 The two main **notebooks** are: 
 1. [01_endog_exog_series.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/01_endog_exog_series.ipynb): Here the four data sources used are downloaded, cleaned and processed

@@ -78,8 +78,10 @@ streamlit run .\streamcovapp.py
 ```
 If there is any problem when running the two python commands in the previous section, the necessary files for visualising the front end are currently saved in GitHub as a back up plan. In order to run the streamlit file from GitHub back up files, please edit `streamcovapp.py` and look for `url1`, `url2`, `url3` and `url4`. Below these variables, you will find the GitHub urls which need to be uncommented and hence comment the local paths accordingly.  
   
-  
-  
+<br/><br/>
+<br/><br/>
+<br/><br/>
+
 **Acknowledgements and disclaimer**. This work relies on the following public data sources:
 * Max Roser, Hannah Ritchie, Esteban Ortiz-Ospina and Joe Hasell (2020) - "Coronavirus Pandemic (COVID-19)". Published online at OurWorldInData.org. Retrieved from: 'https://ourworldindata.org/coronavirus' [Online Resource]
 * Thomas Hale, Sam Webster, Anna Petherick, Toby Phillips, and Beatriz Kira. (2020). Oxford COVID-19 Government Response Tracker. Blavatnik School of Government.

@@ -1,8 +1,8 @@
-# Coronavirus forecast in different countries
+# Coronavirus forecast around the world
 
 **Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors.
 
-This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast.
+This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update models with last observed date.
 
 This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
 
@@ -16,29 +16,6 @@ This tool is not intended for professional use - it is the result of a Data Scie
 * **Modeling**: using Python `SARIMAX` to train one model per country and variable (cases/deaths)
 * **Visualisation**: with `Streamlit`
 * **Deployment**: using `Google Cloud` compute engine, which also runs daily scripts to update data and models with last observed date. Public url: [Live demo](http://34.78.90.249:8501/)
-
-
-## Libraries to install
-Please create a new `Conda` environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system. 
-* If you are in `Windows`, please type:
-```bash
-conda create --name <envname> --file <...>
-```
-* If you are in `Linux`, please type:
-```bash
-conda create --name <envname> --file <...>
-```
-
-## Folder creation
-After cloning this repository in the desired project folder, you would have downloaded 4 folders (apart from the main notebooks and python scripts): `data`, `models`, `plots` and `old`.
-The files contained in these folders are backup in case any process breaks while running main files, so you could still see the final results.
-
-In order to start from a clean slate, please delete locally the contents of the `data`, `models` and `plots` folders since these would be populated when running the scripts. The `old` folder contains initial draft notebooks used for testing code. In order to delete locally the content of these folders, please type in command line:
-```bash
-del ".\data\*.*" /s /f
-del ".\models\*.*" /s /f
-del ".\plots\*.*" /s /f
-```
 
 ## Notebooks and .py files description
 For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the following section).
@@ -60,10 +37,32 @@ The **python** files are:
 5. [streamcovapp.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/streamcovapp.py): Streamlit python file for the front end visualisation.
 6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to update data (`endogenous.csv` and `exogenous.csv`) and add latest observations to all 50 models
 
-## Running .py files
+## Installing the libraries
+Please create a new `Conda` environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system. 
+* If you are in `Windows`, please type:
+```bash
+conda create --name <envname> --file <...>
+```
+* If you are in `Linux`, please type:
+```bash
+conda create --name <envname> --file <...>
+```
+
+## Structuring the folders
+After cloning this repository in the desired project folder, you would have downloaded 4 folders (apart from the main notebooks and python scripts): `data`, `models`, `plots` and `old`.
+The files contained in these folders are backup in case any process breaks while running main files, so you could still see the final results.
+
+In order to start from a clean slate, please delete locally the contents of the `data`, `models` and `plots` folders since these would be populated when running the scripts. The `old` folder contains initial draft notebooks used for testing code. In order to delete locally the content of these folders, please type in command line:
+```bash
+del ".\data\*.*" /s /f
+del ".\models\*.*" /s /f
+del ".\plots\*.*" /s /f
+```
+
+## Creating the models
 In order to run locally the full project, please run the following commands in this order. 
 
-Since the second command (the one with the `model_pipeline_all.py`) gives a lengthy output, it is recommend to add ```> output.txt``` to the command to redirect all the output to a text file.
+Since the second command (the one with the `model_pipeline_all.py`) gives a lengthy output, it is recommend to add ```> output.txt``` to the command to redirect all the output to a text file. Also please be aware that this command may take between one to two hours to run until the end.
 ```bash
 python .\endog_exog_series.py
 ```

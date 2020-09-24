@@ -1,6 +1,6 @@
 # Coronavirus forecast in different countries
 
-**Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and evaluated by the instructors.
+**Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors.
 
 This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast.
 
@@ -40,8 +40,12 @@ del ".\models\*.*" /s /f
 del ".\plots\*.*" /s /f
 ```
 
-## Notebooks
+## Notebooks and .py files description
+For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the following section)
 
+The core work of the project can be seen in two main **notebooks**: 
+1. [01_endog_exog_series.ipynb](change...): Here the four data sources used are downloaded, cleaned and processed into 2 csvs (`endogenous.csv` and `exogenous.csv`)
+2. [02_country_model_pipeline.ipynb](change...): This one contains the optimized process to create one `SARIMAX` model per country per variable (25 countries x 2 variables per country = 50 models in total)
 
 ## Running .py files
 

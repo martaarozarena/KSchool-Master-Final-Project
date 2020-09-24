@@ -1,12 +1,12 @@
-# Coronavirus forecast in different countries
+# Coronavirus forecast around the world
 
 **Initial note**: This `readme` explains how to run this project. It contains special instructions since the purpose is that it can be locally run and also evaluated by the instructors.
 
-This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast.
+This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.
 
 This tool is not intended for professional use - it is the result of a Data Science Master's final project and hence includes all necessary steps:
 
-* **Data acquisition**: data is downloaded from various open data sources (cited at the end of this `readme`) and saved in the two main csvs used for this project - `endogenous.csv` and `exogenous.csv`
+* **Data acquisition**: data is downloaded from various open data sources (cited at the end of this `readme`) and saved in the two main csvs used in this project - `endogenous.csv` and `exogenous.csv`. Data sources:
   * OurWorldInData.org (https://ourworldindata.org/coronavirus): daily numbers of coronavirus cases and deaths by country form the `endogenous` dataset. The daily positive rate by country is part of the `exogenous` dataset.
   * Oxford Covid-19 Government Response Tracker (OxCGRT) (https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker): collects systematic information on which governments have taken which measures, and when. 11 of these country level policies have been integrated into the `exogenous` dataset.
   * YouGov Covid 19 Behaviour Tracker (https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): percentage of people who say they are wearing a face mask when in public places in each country. This data is included in the `exogenous` dataset, at country level.
@@ -17,8 +17,27 @@ This tool is not intended for professional use - it is the result of a Data Scie
 * **Visualisation**: with `Streamlit`
 * **Deployment**: using `Google Cloud` compute engine, which also runs daily scripts to update data and models with last observed date. Public url: [Live demo](http://34.78.90.249:8501/)
 
+## Notebooks and .py files description
+For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detail in the sections below).
 
-## Libraries to install
+The two main **notebooks** are: 
+1. [01_endog_exog_series.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/01_endog_exog_series.ipynb): Here the four data sources used are downloaded, cleaned and processed
+2. [02_country_model_pipeline.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/02_country_model_pipeline.ipynb): This one contains the optimized process to create one `SARIMAX` model per country per variable (25 countries x 2 variables per country = 50 models in total). At the beginning of the notebook, in order to 'play' with different countries/models, you could change the variables `country` and `variable` to one of the options below:
+    * `country`: 'Australia', 'Canada', 'China', 'Denmark', 'Finland', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Norway', 'Philippines', 'Saudi Arabia', 'Singapore', 'Spain', 'Sweden', 'Taiwan', 'Thailand', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam'
+    * `variable`: 'new_cases_', 'new_deaths_'
+
+The **python** files are:
+1. [endog_exog_series.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/endog_exog_series.py): Here the four data sources used are downloaded, cleaned and saved into 2 csvs (`endogenous.csv` and `exogenous.csv`)
+2. [datatools.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py): Module created to define some functions used in the scripts/notebooks that creates the SARIMAX country models
+3. [model_pipeline_one.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_one.py): Simplified version of the `02_country_model_pipeline.ipynb` notebook with just one function which takes arguments `country` and `variable`. The function:
+    * Creates the SARIMAX model for that country and variable, and saves it in the `models` folder
+    * Creates 2 plots per country/variable and saves them in the `plots` folder: one with the test prediction and the other one with a simulated forecast, where exogenous variables in the future don't change
+    * Returns the SARIMAX (p,d,q) order, the MAE and MAE% - used later to create a results summary file
+4. [model_pipeline_all.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_all.py): creates all the 50 models and summarises the results in the `results.csv` file created in the main project folder
+5. [streamcovapp.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/streamcovapp.py): Streamlit python file for the front end visualisation.
+6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to update data (`endogenous.csv` and `exogenous.csv`) and add latest observations to all 50 models
+
+## Installing the libraries
 Please create a new `Conda` environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system. 
 * If you are in `Windows`, please type:
 ```bash
@@ -26,10 +45,13 @@ conda create --name <envname> --file <...>
 ```
 * If you are in `Linux`, please type:
 ```bash
-conda create --name <envname> --file <...>
+pip install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r /path/to/requirements.txt
 ```
 
-## Folder creation
+## Structuring the folders
 After cloning this repository in the desired project folder, you would have downloaded 4 folders (apart from the main notebooks and python scripts): `data`, `models`, `plots` and `old`.
 The files contained in these folders are backup in case any process breaks while running main files, so you could still see the final results.
 
@@ -40,30 +62,10 @@ del ".\models\*.*" /s /f
 del ".\plots\*.*" /s /f
 ```
 
-## Notebooks and .py files description
-For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the following section).
-
-The two main **notebooks** are: 
-1. [01_endog_exog_series.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/01_endog_exog_series.ipynb): Here the four data sources used are downloaded, cleaned and processed
-2. [02_country_model_pipeline.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/02_country_model_pipeline.ipynb): This one contains the optimized process to create one `SARIMAX` model per country per variable (25 countries x 2 variables per country = 50 models in total). At the beginning of the notebook, in order to 'play' with different countries/models, you could change the variables `country` and `variable` to one of the options below:
- * `country`: Australia', 'Canada', 'China', 'Denmark', 'Finland', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Norway', 'Philippines', 'Saudi Arabia', 'Singapore', 'Spain', 'Sweden', 'Taiwan', 'Thailand', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam'
- * `variable`: 'new_cases_', 'new_deaths_'
-
-The **python** files are:
-1. [endog_exog_series.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/endog_exog_series.py): Here the four data sources used are downloaded, cleaned and saved into 2 csvs (`endogenous.csv` and `exogenous.csv`)
-2. [datatools.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py): Module created to define some functions used in the scripts/notebooks that creates the SARIMAX country models
-3. [model_pipeline_one.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_one.py): Simplified version of the `02_country_model_pipeline.ipynb` notebook with just one function which takes arguments `country` and `variable`. The function:
- * Creates the SARIMAX model for that country and variable, saved in the `models` folder
- * Creates 2 plots per country/variable saved in the `plots` folder: one with the test prediction and the other one with a simulated forecast, where exogenous variables in the future don't change
- * Returns the SARIMAX (p,d,q) order, the MAE and MAE% - used later to create a results summary file
-4. [model_pipeline_all.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_all.py): creates all the 50 models and summarises the results in the `results.csv` file created in the main project folder
-5. [streamcovapp.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/streamcovapp.py): Streamlit python file for the front end visualisation.
-6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to update data (`endogenous.csv` and `exogenous.csv`) and add latest observations to all 50 models
-
-## Running .py files
+## Creating the models
 In order to run locally the full project, please run the following commands in this order. 
 
-Since the second command (the one with the `model_pipeline_all.py`) gives a lengthy output, it is recommend to add ```> output.txt``` to the command to redirect all the output to a text file.
+Since the second command (the one with the `model_pipeline_all.py`) gives a lengthy output, it is recommend to add ```> output.txt``` to the command to redirect all the output to a text file. Also please be aware that this command may take between one to two hours to run until the end.
 ```bash
 python .\endog_exog_series.py
 ```

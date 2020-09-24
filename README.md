@@ -45,7 +45,10 @@ conda create --name <envname> --file <...>
 ```
 * If you are in `Linux`, please type:
 ```bash
-conda create --name <envname> --file <...>
+pip install virtualenv
+virtualenv venv
+source venv/bin/activate
+pip install -r /path/to/requirements.txt
 ```
 
 ## Structuring the folders

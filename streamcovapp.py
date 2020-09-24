@@ -34,7 +34,7 @@ col_c = var_c + country
 col_d = var_d + country
 
 
-#@st.cache
+@st.cache
 def get_endog(datecol, col):
     url1 = 'https://raw.githubusercontent.com/martaarozarena/KSchool-Master-Final-Project/master/data/endogenous.csv'
     covid_ctry_varR = pd.read_csv(url1, parse_dates=[datecol], index_col=[datecol], usecols=[datecol, col])
@@ -178,6 +178,7 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
     first_fut.columns = [endog_ctry.columns[0]]
     nexus = pd.concat([last_endog, first_fut]).reset_index()
 
+    # Extract MAE from summary table created from the models:
     maes = summary.loc[(summary.ctry==country) & (summary.endog.str.contains(vary)), 'mae'].array[0]
     text = 'Test MAE (mean absolute error): {}'.format(maes)
 
@@ -196,7 +197,7 @@ def fcast_plot(varx, vary, endog_ctry, col, model):
 
     future_rs = forecast14S.to_frame().reset_index()
     future_plt = alt.Chart(future_rs).mark_line(color='orange').encode(
-        x=alt.X('index:T', axis=alt.Axis(title=text)),
+        x=alt.X('index:T', axis=alt.Axis(title=text, titleFontWeight='normal')),
         y=alt.Y(varx+'forecast', axis=alt.Axis(title=None)),
         tooltip=alt.Tooltip(['index', varx+'forecast'])
     ).interactive()

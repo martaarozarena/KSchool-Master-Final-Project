@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Importing all necessary libraries
 
 import warnings

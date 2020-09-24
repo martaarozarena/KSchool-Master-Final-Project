@@ -44,8 +44,8 @@ del ".\plots\*.*" /s /f
 For the purpose of evaluating this project, there are two main notebooks where the core work can be seen (including graphs). But for the purpose of running the entire project, it can all be done by running 3 commands (explained in detailed in the following section).
 
 The two main **notebooks** are: 
-1. [01_endog_exog_series.ipynb](change...): Here the four data sources used are downloaded, cleaned and processed
-2. [02_country_model_pipeline.ipynb](change...): This one contains the optimized process to create one `SARIMAX` model per country per variable (25 countries x 2 variables per country = 50 models in total). At the beginning of the notebook, in order to 'play' with different countries/models, you could change the variables `country` and `variable` to one of the options below:
+1. [01_endog_exog_series.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/01_endog_exog_series.ipynb): Here the four data sources used are downloaded, cleaned and processed
+2. [02_country_model_pipeline.ipynb](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/02_country_model_pipeline.ipynb): This one contains the optimized process to create one `SARIMAX` model per country per variable (25 countries x 2 variables per country = 50 models in total). At the beginning of the notebook, in order to 'play' with different countries/models, you could change the variables `country` and `variable` to one of the options below:
  * `country`: Australia', 'Canada', 'China', 'Denmark', 'Finland', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Norway', 'Philippines', 'Saudi Arabia', 'Singapore', 'Spain', 'Sweden', 'Taiwan', 'Thailand', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam'
  * `variable`: 'new_cases_', 'new_deaths_'
 

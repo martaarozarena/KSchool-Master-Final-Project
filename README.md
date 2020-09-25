@@ -33,7 +33,7 @@ The **python** files are:
     * Returns the SARIMAX (p,d,q) order, the MAE and MAE% - used later to create a results summary file
 4. [model_pipeline_all.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_all.py): creates all the 50 models and summarises the results in the `results.csv` file created in the main project folder
 5. [streamcovapp.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/streamcovapp.py): Streamlit python file for the front end visualisation.
-6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to update data (`endogenous.csv` and `exogenous.csv`) and add latest observations to all 50 models
+6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to add latest observations to all 50 models
 
 ## Installing the libraries
 Please create a new `Conda` environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system. 

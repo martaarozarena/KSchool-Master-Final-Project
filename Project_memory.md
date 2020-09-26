@@ -101,7 +101,7 @@ In general, we can say that the forecast's MAE are relatively high resulting in 
 
 ## Conclusions
 
-* aquí va mi prueba
+As a conclusion we could say the models work well but most of them have a high error which means there is still room for improvement. There are several thing that could be analized: the interpolation of the variables to make i more accurate, also the order of the models. Could happen that other q,p,d values tend to better results and finally revising the exogenos variables could also help. maybe adding new variables and changing some of the ones we have could also help in the final result.
 
 
 ## User manual front end

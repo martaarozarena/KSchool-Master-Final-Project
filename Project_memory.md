@@ -1,6 +1,7 @@
 # Project memory
 
 This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.  
+
 The detailed instructions to replicate the full project can be found in the [README.md](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/README.md).
 
 ## Introduction
@@ -48,6 +49,10 @@ The normalization was done with minmaxscaler between 0 and 1
 Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:
 1. Train/test split: the `endogenous` and `exogenous` dataframes are split into train and test. We chose 85% of the data for the train size as data starts on Jan 1st 2020 and for the majority of the countries coronavirus cases start in March, and the deaths curve starts even later (meaning the first values of the series are all zero for many countries).
 2. Stationarity: one big drawback of ARIMA models is that the series to be forecasted (`endogenous`) needs to be stationary in order to get somewhat good predictions. The typical cases/deaths curve are not stationary at all, so needed to be transformed. After looking at various options, applying 1st order differencing or 2nd order differencing resulted in a stationary series. This was also confirmed by the auto-correlation function (ACF), partial auto-correlation function (PACF) plots and different statistical tests (kpss, adf, pp). For this reason, we 'fixed' the differencing term of ARIMA (d) to be 1 or 2.
+We created a function called `plot_acf_pacf()` (which can be found [here](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py)) that helps to quickly visualize the ACF and PACF plots for the 1st order differencing and the 2nd order differencing. An example output for US new cases can be founde below:
+
+![acf_pacf_ex](https://drive.google.com/file/d/1_FIsmxhSh9go3PcDC8gKWdeOGcBPoJ2N/view?usp=sharing)
+
 3. Selecting orders p and q of ARIMA. The best way to do this was through the `auto_arima` process of `pmdarima` library. This tool performs a grid search in order to identify the most optimal parameters and its results vary widely depending on the arguments included. The best solution we found was to loop over different auto_arimas changing some of its arguments, one of them being the differencing term (d) which we set in the previous step to 1 or 2, the other being the stepwise argument. So we created a function `autoarimas()` (which can be found [here](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py)) with this loop and returned a table of the 4 ARIMA models and their AIC, sorted by AIC. We selected the top 3 and moved to the next phase. 
 An example of the output of the `autoarimas` function for US new cases can be found below:  
 

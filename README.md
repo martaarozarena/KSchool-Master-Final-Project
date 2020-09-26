@@ -39,13 +39,13 @@ The **python** files are:
 Please create a new `Conda` environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system. 
 * If you are in `Windows`, please type:
 ```bash
-conda create --name <envname> --file <...>
+conda env create --name <envname> --file reqWindows.yaml
 ```
 * If you are in `Linux`, please type:
 ```bash
 pip install virtualenv
-virtualenv venv
-source venv/bin/activate
+virtualenv <venvname>
+source <venvname>/bin/activate
 pip install -r /path/to/requirements.txt
 ```
 

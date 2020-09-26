@@ -14,18 +14,17 @@ Once we had the idea (predicting coronavirus cases/deaths in 25 countries) and t
 
 ## Raw data description
 
-We needed to look for time series that were available both on a daily basis and at country level, since the idea was to build one model per country and per each of the variables (cases/deaths). Below are the data sources we investigated:
+We needed to look for time series that were available both on a **daily** basis and at **country** level, since the idea was to build one model per country and per each of the variables (cases/deaths). Below are the data sources we investigated:
+
+
+* OurWorldInData.org [Our World in Data COVID-19 data](https://github.com/owid/covid-19-data/tree/master/public/data): from here we download, on a daily basis, the daily numbers of coronavirus cases and deaths by country
+* Oxford Covid-19 Government Response Tracker (OxCGRT) (https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker): collects systematic information on which governments have taken which measures, and when. 11 of these country level policies have been integrated into the `exogenous` dataset.
+* YouGov Covid 19 Behaviour Tracker (https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): percentage of people who say they are wearing a face mask when in public places in each country. This data is included in the `exogenous` dataset, at country level.
+* [Crowdsourced air traffic data from The OpenSky Network 2020](https://zenodo.org/record/4034518#.X29OCWgzaF4): The data in this dataset is derived and cleaned from the full OpenSky dataset to illustrate the development of air traffic during the COVID-19 pandemic. The biggest problem encountered here was that most of the flights did not include origin/destination. They did have their callsign but we didn't find a right dataset to decode the callsigns into flight numbers, to then derive their origin/destination.
+* Eurocontrol airport traffic dataset (https://ansperformance.eu/covid/): the number of daily arrivals by country (only for European countries) is included in the `exogenous` dataset.
 
 
 ## Methodology
-### Data cleaning
-When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas, scikit-learn, statmodels and pmdarima libraries. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing dates.
-
-The first idea was to create a predictive model for the flights (there is a `flightspre.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
-
-For the covid data, as countries do not report data properly day by day and lot of times coronavirus cases are reported several days after the confirmed infection or even reporting negative values to correct the curve, we decided to make a 7 days rolling average. After this, there were still some missing values and we applied a liner interpolation as it is normal to think that between 2 coronavirus cases values, the growth has been linear.
-
-
 ### Front end
 In order to deploy the front end we analyzed several options:
   1. Jupyter-Hub it is a user-friendly web app but it has 2 big problems, we need to give access to people to see the front end and second we need the computer running to make it work non-stop.

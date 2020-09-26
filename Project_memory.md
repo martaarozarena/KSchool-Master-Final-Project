@@ -75,7 +75,7 @@ In order to deploy the front end we analyzed several options:
   4. Google cloud compute engine: with only a virtual machine it was possible to deploy the streamlit and make it public. This option was the easiest one and the cheapest since we had the google cloud trial period. The make it public we had 2 options, Ngrok library to create a URL or opening the ports and give access to the machine, we decided to open ports. 
 
 The selected option was then the fourth one, we created a virtual machine and though the ssh connection system we transferred all the files from github to the machine. Once the files were in there, we had to open the ports. by default google creates a firewall to protect the machine from external connections therefore we had to make a firewall rule to allow everyone accessing streamlit. Opened ports were from 7000-9000 to make sure they were all opened in case streamlit uses other ports and not only the default one.
-Next step was to create a static IP so we could access the app with the same IP always and finally the public URL was 34.78.90.249:8501
+Next step was to create a static IP so we could access the app with the same IP always and finally the public URL was (http://34.78.90.249:8501)
 
 To prepare the VM to run streamlit we had to schedule 2 different actions. first one was to run everyday at 3am the endog_exog scrip to update the data and second was to run the model_act scrip at 3.30 am to update the models. we used crontab to do this actions and the result was the following:
 ![crontab image]( https://drive.google.com/uc?export=download&id=1uWb_thqh2qK5wOg1a-zxHRXKxJzzgpvi)
@@ -95,7 +95,7 @@ Everything is ready to deploy streamlit with the following line `nohup streamlit
 
 ## User manual front end
 ### Public front end
-There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though ![this link](http://34.78.90.249:8502/)
+There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though ![this link](34.78.90.249:8502/)
 Once in the website there are two different parts on the app:
   1. A sidebar on the left side where there are 5 values you can play with. The first option is the country you want to forecast for and the other 4 represent the exogenous values we want to use for the prediction.
   2. The main page where we can see the forecast for the next 14 days for both deaths and infections cases. This forecast comes with 2 graphs showing in blue the data until today and in yellow the predictions for both deaths and infections.

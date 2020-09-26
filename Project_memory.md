@@ -28,20 +28,21 @@ The data downloaded is already in time series format, and is added to the `exoge
 
 
 ## Methodology
+### Data exploration and cleaning
 
-### Data cleaning
+Before starting cleaning, an exploratory analisis was done, using pandas and seaborn libraries we could look exactly what data we got. the name of the columns, the type of data and number of missing values, also we used seaborn to see the evolution of the data visually per country and all together. Part of that exploration can be found in `coviddata` file.
 
-When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas library. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. Also data must be prepared for SARIMAX model so exogenous variables must be in a Dataframe with the variables in the columns and the dates in the index.
+After exploration, next step was the cleaning and normalization part. For this, we used pandas library. The first part consisted of filter the data and take only the information of our 25 countries from 1st of january on. Then we checked there were no missing data and in case there were, find the way of filling the gaps. Also data had to be prepared for SARIMAX model so exogenous variables had to be in a Dataframe with the variables in the columns and the dates in the index.
 
-In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing values. The first idea was to create a predictive model for the flights (there is a `flightspred.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
+In our case, flights data was updated once a month so from the actualization date to the prediction date there were some missing values. The first idea was to create a predictive model for the flights (there is a `flightspred.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
 
 For the covid data, as countries do not report data properly day by day and lot of times coronavirus cases are reported several days after the confirmed infection or even reported negative values to correct the curve, we decided to make a 7 days rolling average. After this, there were still some missing values and we applied a linear interpolation.
 
 The 7 days rolling average was done in all the exogenous variables as well and then a linear interpolation to avoid missing values.
 
-Once we have all the variables cleaned, by day and without NaNs, it is time to normalize them so the scale is the same for all the variables and there is not one with more impact on the model than the others due to the difference in magnitude (e.g. flights in comparison with policy variables).
+Once we have all the variables cleaned, by day and without NaNs, it was time to normalize them so the scale was the same for all the variables and there was not one with more impact on the model than the others due to the difference in magnitude (e.g. flights in comparison with policy variables).
 
-The normalization has been done with minmaxscaler between 0 and 1
+The normalization was done with minmaxscaler between 0 and 1
 
 ### Modeling
 Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:

@@ -36,17 +36,17 @@ The **python** files are:
 6. [model_act.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/model_act.py): Script run daily in Google Cloud to add latest observations to all 50 models
 
 ## Installing the libraries
-Please create a new environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system, which can be found in the main project folder.
+Please create a new environment with the required libraries. Since the project has been done in Windows and Linux simultaneously, there are 2 requirements files depending on the system, which can be found in the main project folder ([reqWindows.yaml](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/reqWindows.yaml) and [requirements.txt](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/reqLinux.txt)).
 * If you are in `Windows`, please type:
 ```bash
-conda env create --name <envname> --file [reqWindows.yaml](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/reqWindows.yaml)
+conda env create --name <envname> --file reqWindows.yaml
 ```
 * If you are in `Linux`, please type:
 ```bash
 pip install virtualenv
 virtualenv <venvname>
 source <venvname>/bin/activate
-pip install -r /path/to/[requirements.txt](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/reqLinux.txt)
+pip install -r /path/to/requirements.txt
 ```
 
 ## Structuring the folders

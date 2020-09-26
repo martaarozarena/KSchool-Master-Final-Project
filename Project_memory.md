@@ -14,7 +14,7 @@ Once we had the idea (predicting coronavirus cases/deaths in 25 countries) and t
 
 ## Raw data description
 
-We needed to look for time series that were available 
+We needed to look for time series that were available both on a daily basis and at country level, since the idea was to build one model per country and per each of the variables (cases/deaths). Below are the data sources we investigated:
 
 
 ## Methodology
@@ -42,4 +42,3 @@ Everything is ready to deploy streamlit with the following line nohup streamlit 
 ## Conclusions
 
 ## User manual front end
-prueba githubiana

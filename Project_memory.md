@@ -1,6 +1,7 @@
 # Project memory
 
-This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.
+This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.  
+The detailed instructions to replicate the full project can be found in the [README.md](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/README.md).
 
 ## Introduction
 
@@ -14,17 +15,20 @@ Once we had the idea (predicting coronavirus cases/deaths in 25 countries) and t
 
 ## Raw data description
 
+The countries we selected for our project were the following: 'Australia', 'Canada', 'China', 'Denmark', 'Finland', 'France', 'Germany', 'India', 'Indonesia', 'Italy', 'Japan', 'Malaysia', 'Mexico', 'Norway', 'Philippines', 'Saudi Arabia', 'Singapore', 'Spain', 'Sweden', 'Taiwan', 'Thailand', 'United Arab Emirates', 'United Kingdom', 'United States', 'Vietnam'.
+
 We needed to look for time series that were available both on a **daily** basis and at **country** level, since the idea was to build one model per country and per each of the variables (cases/deaths). Below are the data sources we investigated:
 
-
-* OurWorldInData.org [Our World in Data COVID-19 data](https://github.com/owid/covid-19-data/tree/master/public/data): from here we download, on a daily basis, the daily numbers of coronavirus cases and deaths by country
-* Oxford Covid-19 Government Response Tracker (OxCGRT) (https://www.bsg.ox.ac.uk/research/research-projects/coronavirus-government-response-tracker): collects systematic information on which governments have taken which measures, and when. 11 of these country level policies have been integrated into the `exogenous` dataset.
-* YouGov Covid 19 Behaviour Tracker (https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): percentage of people who say they are wearing a face mask when in public places in each country. This data is included in the `exogenous` dataset, at country level.
-* [Crowdsourced air traffic data from The OpenSky Network 2020](https://zenodo.org/record/4034518#.X29OCWgzaF4): The data in this dataset is derived and cleaned from the full OpenSky dataset to illustrate the development of air traffic during the COVID-19 pandemic. The biggest problem encountered here was that most of the flights did not include origin/destination. They did have their callsign but we didn't find a right dataset to decode the callsigns into flight numbers, to then derive their origin/destination.
-* Eurocontrol airport traffic dataset (https://ansperformance.eu/covid/): the number of daily arrivals by country (only for European countries) is included in the `exogenous` dataset.
+* [Our World in Data COVID-19 data](https://github.com/owid/covid-19-data/tree/master/public/data): from here we download, on a daily basis, the daily numbers of coronavirus cases and deaths by country, as well as the daily positive rate by country. The CSV file downloaded follows a format of 1 row per location and date. We transform the data into a time series format and create 2 cleaned csvs, in a time series format: one called `endogenous.csv` (which has the cases and deaths) and the other one called `exogenous.csv`, which contains the first set of exogenous data: `positive_rate` by country
+* [Oxford Covid-19 Government Response Tracker (OxCGRT)](https://github.com/OxCGRT/covid-policy-tracker): collects systematic information on which governments have taken which measures, and when. The following 11 country level policies have been integrated into the `exogenous` dataset, again after cleaning and transforming data into time series: 'C1_School closing', 'C2_Workplace closing', 'C3_Cancel public events', 'C4_Restrictions on gatherings', 'C5_Close public transport', 'C6_Stay at home requirements', 'C7_Restrictions on internal movement', 'C8_International travel controls', 'H1_Public information campaigns', 'H2_Testing policy', 'H3_Contact tracing'
+* [YouGov Covid 19 Behaviour Tracker](https://yougov.co.uk/topics/international/articles-reports/2020/03/17/personal-measures-taken-avoid-covid-19): from here we take the data on percentage of people who say they are wearing a face mask when in public places in each country. YouGov has partnered with the Institute of Global Health Innovation (IGHI) at Imperial College London to gather global insights on people’s behaviours in response to COVID-19. The research covers 29 countries, interviewing around 21,000 people each week. The datafiles contain responses from nationally representative surveys of the general public about symptoms, testing, self-isolation, social distancing and behaviour.
+The data downloaded is already in time series format, and is added to the `exogenous` dataset, at country level.
+* [Crowdsourced air traffic data from The OpenSky Network 2020](https://zenodo.org/record/4034518#.X29OCWgzaF4): The data in this dataset is derived and cleaned from the full OpenSky dataset to illustrate the development of air traffic during the COVID-19 pandemic. The biggest problem encountered here was that most of the flights did not include origin/destination. They did have their callsign but we didn't find a right dataset to decode the callsigns into flight numbers, to then derive their origin/destination. We discarded this option and used the below flights data from Eurocontrol
+* [Eurocontrol airport traffic dataset](https://ansperformance.eu/data/): from here we can download an excel from where we extract the number of daily arrivals by country (only for European countries). This data is then integrated into the `exogenous` dataset, in time series format at country level.
 
 
 ## Methodology
+
 ### Data cleaning
 
 When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas library. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. Also data must be prepared for SARIMAX model so exogenous variables must be in a Dataframe with the variables in the columns and the dates in the index.
@@ -38,6 +42,13 @@ The 7 days rolling average was done in all the exogenous variables as well and t
 Once we have all the variables cleaned, by day and without NaNs, it is time to normalize them so the scale is the same for all the variables and there is not one with more impact on the model than the others due to the difference in magnitude (e.g. flights in comparison with policy variables).
 
 The normalization has been done with minmaxscaler between 0 and 1
+
+### Modeling
+Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:
+1. Train/test split: the `endogenous` and `exogenous` dataframes are split into train and test. We chose 85% of the data for the train size as data starts on Jan 1st 2020 and for the majority of the countries coronavirus cases start in March, and the deaths curve starts even later (meaning the first values of the series are all zero for many countries).
+2. Stationarity: one big drawback of ARIMA models is that the series to be forecasted (`endogenous`) needs to be stationary in order to get somewhat good predictions. The typical cases/deaths curve are not stationary at all, so needed to be transformed. After looking at various options, applying 1st order differencing or 2nd order differencing resulted in a stationary series. This was also confirmed by the auto-correlation function (ACF), partial auto-correlation function (PACF) plots and different statistical tests (kpss, adf, pp). For this reason, we 'fixed' the differencing term of ARIMA (d) to be 1 or 2.
+3. Selecting orders p and q of ARIMA. The best way to do this was through the `auto_arima` process of `pmdarima` library. This tool performs a grid search in order to identify the most optimal parameters and its results vary widely depending on the arguments included. The best solution we found was to loop over different auto_arimas changing some of its arguments, one of them being the differencing term (d) which we set in the previous step to 1 or 2, the other being the stepwise argument. So we created a function with this loop and returned a table of the 4 ARIMA models and their AIC, sorted by AIC. We selected the top 3 and moved to the next phase.
+4. Cross validation: We instantiate the 3 ARIMA models from previous step and perform cross validation on each of them. For this we used the `RollingForecastCV` function of `pmdarima` library. And important 
 
 ### Front end
 In order to deploy the front end we analyzed several options:

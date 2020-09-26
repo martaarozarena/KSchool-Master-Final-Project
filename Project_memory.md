@@ -63,7 +63,7 @@ An example of the output of the `autoarimas` function for US new cases can be fo
   |  (1, 1, 1) | -1434.721364 |
   |  (1, 2, 1) | -1423.208902 |
 
-4. Cross validation: We instantiate the 3 ARIMA models from previous step and perform cross validation on each of them. For this we used the `RollingForecastCV` function of `pmdarima` library. Another important decision here was the selection of the KPI to measure forecasting accuracy. We decided to use the `mean absolute error` MAE as it is easy to interpret and seemed to return better forecasts in our case than the root mean squared error (RMSE). So we defined a function `cross_val()` (which can be found [here](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py)) that cross validated our top 3 models and returned the best order, i.e. the one with lowest average MAE.
+4. Cross validation: We instantiate the 3 ARIMA models from previous step and perform cross validation on each of them. For this we used the `RollingForecastCV` function of `pmdarima` library. Another important decision here was the selection of the KPI to measure forecasting accuracy. We decided to use the `mean absolute error` MAE as it is easy to interpret (it has the same unit of measurement as the initial series) and seemed to return better forecasts in our case than the root mean squared error (RMSE). So we defined a function `cross_val()` (which can be found [here](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py)) that cross validated our top 3 models and returned the best order, i.e. the one with lowest average MAE.
 5. Train SARIMAX model: finally we train a SARIMAX model with the best (p,d,q) order extracted from previous step. With this fitted model, we perform a predictions on train (in-sample) and test (out-of-sample) and plot them, after transforming the results back to the original scale. These plots can be found in the `plots` folder. Below is an example of new cases in-sample/out-of-sample predictions in the United States:
 ![US new cases in-out predictions](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/plots/United%20States_new_cases__inoutpredorig.png)
 6. Future forecasting: with the fitted model, we then add the test observations to the model and perform a 14 day forecast into the future. For the sake of visualising results, this forecast is done maintaing the exogenous variables as is, i.e. maintaining the last observed value for the next 14 days. These plots are also saved in the `plots` folder. Below is the US 14 day forecast of new cases in the original scale:
@@ -80,7 +80,7 @@ In order to deploy the front end we analyzed several options:
   4. Google cloud compute engine: with only a virtual machine it was possible to deploy the streamlit and make it public. This option was the easiest one and the cheapest since we had the google cloud trial period. The make it public we had 2 options, Ngrok library to create a URL or opening the ports and give access to the machine, we decided to open ports. 
 
 The selected option was then the fourth one, we created a virtual machine and though the ssh connection system we transferred all the files from github to the machine. Once the files were in there, we had to open the ports. by default google creates a firewall to protect the machine from external connections therefore we had to make a firewall rule to allow everyone accessing streamlit. Opened ports were from 7000-9000 to make sure they were all opened in case streamlit uses other ports and not only the default one.
-Next step was to create a static IP so we could access the app with the same IP always and finally the public URL was (http://34.78.90.249:8501)
+Next step was to create a static IP so we could access the app with the same IP always and finally the public URL was [Live demo](http://34.78.90.249:8501)
 
 To prepare the VM to run streamlit we had to schedule 2 different actions. first one was to run everyday at 3am the endog_exog scrip to update the data and second was to run the model_act scrip at 3.30 am to update the models. we used crontab to do this actions and the result was the following:
 ![crontab image]( https://drive.google.com/uc?export=download&id=1uWb_thqh2qK5wOg1a-zxHRXKxJzzgpvi)
@@ -93,23 +93,24 @@ Everything is ready to deploy streamlit with the following line `nohup streamlit
 
 ## Summary of main results
 
-The project has two main objectives: 1) was to try to predict new coronavirus cases/deaths and the 2) one was to deploy in a public url the work done, avoiding the need of installing anything on your laptop.
+The project had two main objectives: 1) was to try to predict new coronavirus cases/deaths and the 2) one was to deploy in a public url the work done, avoiding the need of installing anything on your laptop.
 1. Regarding the coronavirus forecasts, the results vary a lot depending on the country. In order to understand the country's results all together, in the script [Model_pipeline_all.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_all.py) we generate a csv [results.csv](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/results.csv) with the summarised results per country, which are: country, variable (new cases/new deaths), order of the model, MAE and MAE%. This csv helps to do a quick visual comparison of the each country's model performance.  
 In general, we can say that the forecast's MAE are relatively high resulting in poor forecasts, with some exceptions like US, Mexico, India, Indonesia, Japan, Finland or Philippines. Also we can see that the new cases forecasts tend to be better than the new deaths, which makes sense since the curve of new deaths starts later in time (less data from which to learn) and the numbers are low in many of the countries.  
-
+These results tell us that there is definitely room for improvement in: looking for more exogenous variables that could impact the numbers, selecting the order for the models, interpolating the missing values 
 2. The second objective was deployed after testing many different options. Here we encountered two difficulties: we wanted the visualisation tool to be able to do live forecasts after user introduced changes in the exogenous variables. The other issue was to update on a daily basis the data in the background, so the forecasts remained always up to date. These difficulties were finally overcome, as explained in the previous section, and the app continues its daily updates in the background.  
 
 ## Conclusions
 
-As a conclusion we could say the models work well but most of them have a high error which means there is still room for improvement. There are several thing that could be analized:
-  1. the interpolation of the variables to make it more accurate
-  2. the order of the models. Could happen that other q,p,d values tend to better results
-  3. and finally revising the exogenous variables. Could be that adding new variables and changing some of the ones we have help in the final result.
+Our main conclusions of the project are:
+* You learn a great deal by going throught all the stages of a data science project. Not only about machine learning or Python, but also about the many other problems you encounter on the way: virtual environment conflicts, working across different platforms, library versions and its documentation, GitHub, command line... and the list goes on.
+* Being two developing the project gaves us a range of opportunities: working in a more real setup where you need to collaborate and communicate effectively, and also allowing us to invest more time in specific topics of interest.
+* Balance between quality and cost is important. Time series analysis/forecasting with SARIMAX could be a very manual process since you need to look for stationarity in the data (plotting, statistical tests,...), you need to select the right (p,d,q) orders which change vastly the results, you need to check that the residuals of the fitted model are stationary... and in the end, the forecasts are not amazing. Bacause of this very time consuming process, we didn't have the time to inspect other time series forecasting approaches, such as linear models, LSTM or XGBoost.
+* We have tried to understand a real life problem in order to see how some decisions could affect the future number of cases/deaths in a way we haven't seen published before (at least when we started the project). Combining various data sources, at country level, which have a direct impact on the number of cases/deaths was the novelty. Also previous works were base on SIR models, but not SARIMAX.
 
 
 ## User manual front end
 ### Public front end
-There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though ![this link](34.78.90.249:8502/)
+There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though [Live demo]((http://34.78.90.249:8501)
 Once in the website there are two different parts on the app:
   1. A sidebar on the left side where there are 5 values you can play with. The first option is the country you want to forecast for and the other 4 represent the exogenous values we want to use for the prediction.
   2. The main page where we can see the forecast for the next 14 days for both deaths and infections cases. This forecast comes with 2 graphs showing in blue the data until today and in yellow the predictions for both deaths and infections.

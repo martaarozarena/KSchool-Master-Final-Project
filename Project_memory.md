@@ -84,7 +84,7 @@ The selected option was then the fourth one, we created a virtual machine and th
 Next step was to create a static IP so we could access the app with the same IP always and finally the public URL was [Live demo](http://34.78.90.249:8501)
 
 To prepare the VM to run streamlit we had to schedule 2 different actions. first one was to run everyday at 3am the endog_exog scrip to update the data and second was to run the model_act scrip at 3.30 am to update the models. we used crontab to do this actions and the result was the following:
-![crontab image]( https://drive.google.com/uc?export=download&id=1uWb_thqh2qK5wOg1a-zxHRXKxJzzgpvi)
+![crontab image](https://drive.google.com/uc?export=download&id=1uWb_thqh2qK5wOg1a-zxHRXKxJzzgpvi)
 
 As it is possible to see in the pic, it has also been added after the running of the file to copy all the outputs in another file called mycmd so in case something happens we can trace the error (command to see the file: `grep 'mycmd' /var/log/syslog`). Also all the scripts need to have at the begginning `#!/usr/bin/env python3` to tell crontab it is a python3 file so it can run it
 

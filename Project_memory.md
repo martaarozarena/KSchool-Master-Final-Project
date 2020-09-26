@@ -14,7 +14,7 @@ Once we had the idea (predicting coronavirus cases/deaths in 25 countries) and t
 
 ## Raw data description
 
-We needed to look for daily series f
+We needed to look for time series that were available 
 
 
 ## Methodology

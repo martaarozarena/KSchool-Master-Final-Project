@@ -112,8 +112,8 @@ Our main conclusions of the project are:
 ### Public front end
 There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though [Live demo](http://34.78.90.249:8501)
 Once in the website there are two different parts on the app:
-  1. A sidebar on the left side where there are 5 values you can play with. The first option is the country you want to forecast for and the other 4 represent the exogenous values we want to use for the prediction.
-  2. The main page where we can see the forecast for the next 14 days for both deaths and infections cases. This forecast comes with 2 graphs showing in blue the data until today and in yellow the predictions for both deaths and infections.
+  1. A sidebar on the left side where there are 5 values you can play with. The first option is to choose the country the user wants to make the forecast on, and the other 4 represent the exogenous values (on 2 exogenous variables: testing and contact tracing) we ask the user to modify to see how those changes impact the forecast.
+  2. The main central page is where we can see the forecast for the next 14 days, for both new cases and deaths. This forecast comes with 2 graphs showing in blue the data until 'yesterday' and in orange the predictions from 'today', for both new cases and deaths.
   
 ### Local front end
 When `endog_exog_series.py`and `model_pipeline_all.py` have been run in local, to run the streamlit app it is only needed to write in the terminal `streamlit run streamcovapp.py`.

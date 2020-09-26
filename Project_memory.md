@@ -18,6 +18,14 @@ We needed to look for time series that were available both on a daily basis and 
 
 
 ## Methodology
+### Data cleaning
+When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas, scikit-learn, statmodels and pmdarima libraries. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing dates.
+
+The first idea was to create a predictive model for the flights (there is a `flightspre.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
+
+For the covid data, as countries do not report data properly day by day and lot of times coronavirus cases are reported several days after the confirmed infection or even reporting negative values to correct the curve, we decided to make a 7 days rolling average. After this, there were still some missing values and we applied a liner interpolation as it is normal to think that between 2 coronavirus cases values, the growth has been linear.
+
+
 ### Front end
 In order to deploy the front end we analyzed several options:
   1. Jupyter-Hub it is a user-friendly web app but it has 2 big problems, we need to give access to people to see the front end and second we need the computer running to make it work non-stop.

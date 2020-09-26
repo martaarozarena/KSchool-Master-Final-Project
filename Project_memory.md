@@ -29,6 +29,19 @@ The data downloaded is already in time series format, and is added to the `exoge
 
 ## Methodology
 
+### Data cleaning
+When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas, scikit-learn, statmodels and pmdarima libraries. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing values.
+
+The first idea was to create a predictive model for the flights (there is a `flightspred.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
+
+For the covid data, as countries do not report data properly day by day and lot of times coronavirus cases are reported several days after the confirmed infection or even reported negative values to correct the curve, we decided to make a 7 days rolling average. After this, there were still some missing values and we applied a liner interpolation.
+
+The 7 days rolling average was done in all the exogenous variables as well and then a linear interpolation to avoid missing values.
+
+Once we have all the variables cleaned, by day and without NaNs,it is time to normalize them so the scale is the same for all the variables and there is not one with more impact on the model than the others due to high values (like flights in comparison with policy variables).
+
+The normalization has been done with minmaxscaler between 0 and 1
+
 ### Modeling
 Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:
 1. Train/test split: the `endogenous` and `exogenous` dataframes are split into train and test. We chose 85% of the data for the train size as data starts on Jan 1st 2020 and for the majority of the countries coronavirus cases start in March, and the deaths curve starts even later (meaning the first values of the series are all zero for many countries).
@@ -47,11 +60,11 @@ Next step was to create a static IP so we could access the app with the same IP 
 To prepare the VM to run streamlit we had to schedule 2 different actions. first one was to run everyday at 3am the endog_exog scrip to update the data and second was to run the model_act scrip at 3.30 am to update the models. we used crontab to do this actions and the result was the following:
 ![crontab image]( https://drive.google.com/uc?export=download&id=1uWb_thqh2qK5wOg1a-zxHRXKxJzzgpvi)
 
-As it is possible to see in the pic, it has also been added after the running of the file to copy all the outputs in another file called mycmd so in case something happens we can trace the error (command to see the file: grep 'mycmd' /var/log/syslog). Also all the scripts need to have at the begginning #!/usr/bin/env python3 to tell crontab it is a python3 file so it can run it
+As it is possible to see in the pic, it has also been added after the running of the file to copy all the outputs in another file called mycmd so in case something happens we can trace the error (command to see the file: `grep 'mycmd' /var/log/syslog`). Also all the scripts need to have at the begginning `#!/usr/bin/env python3` to tell crontab it is a python3 file so it can run it
 
-Finally the only thing missing to run the files is to give them access to execute and write whatever they need. this is done in the terminal with the following command chmod 777 file.txt
+Finally the only thing missing to run the files is to give them access to execute and write whatever they need. this is done in the terminal with the following command `chmod 777 file.txt`
 
-Everything is ready to deploy streamlit with the following line nohup streamlit run streamcovapp.py. nohup is needed as it tells the machine not to stop the streamlit when we close the terminal.
+Everything is ready to deploy streamlit with the following line `nohup streamlit run streamcovapp.py`. nohup is needed as it tells the machine not to stop the streamlit when we close the terminal.
 
 ## Summary of main results
 
@@ -61,3 +74,12 @@ Everything is ready to deploy streamlit with the following line nohup streamlit 
 
 
 ## User manual front end
+### Public front end
+There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though ![this link](http://34.78.90.249:8502/)
+Once in the website there are two different parts on the app:
+  1. A sidebar on the left side where there are 5 values you can play with. The first option is the country you want to forecast for and the other 4 represent the exogenous values we want to use for the prediction.
+  2. The main page where we can see the forecast for the next 14 days for both deaths and infections cases. This forecast comes with 2 graphs showing in blue the data until today and in yellow the predictions for both deaths and infections.
+  
+### Local front end
+When `endog_exog_series.py`and `model_pipeline_all.py` have been run in local, to run the streamlit app it is only needed to write in the terminal `streamlit run streamcovapp.py`.
+There rest is exactly the same than using the Public front end.

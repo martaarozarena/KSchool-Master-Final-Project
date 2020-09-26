@@ -74,7 +74,10 @@ Everything is ready to deploy streamlit with the following line `nohup streamlit
 
 ## Conclusions
 
-As a conclusion we could say the models work well but most of them have a high error which means there is still room for improvement. There are several thing that could be analized: the interpolation of the variables to make i more accurate, also the order of the models. Could happen that other q,p,d values tend to better results and finally revising the exogenos variables could also help. maybe adding new variables and changing some of the ones we have could also help in the final result.
+As a conclusion we could say the models work well but most of them have a high error which means there is still room for improvement. There are several thing that could be analized:
+1.the interpolation of the variables to make it more accurate
+2.the order of the models. Could happen that other q,p,d values tend to better results
+3.and finally revising the exogenous variables. Could be that adding new variables and changing some of the ones we have help in the final result.
 
 
 ## User manual front end

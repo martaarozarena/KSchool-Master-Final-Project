@@ -28,10 +28,11 @@ The data downloaded is already in time series format, and is added to the `exoge
 
 
 ## Methodology
+### Data exploration and cleaning
 
-### Data cleaning
+Before starting cleaning, an exploratory analisis was done, using pandas and seaborn libraries we could look exactly what data we got. the name of the columns, the type of data and number of missing values, also we used seaborn to see the evolution of the data visually per country and all together. Part of that exploration can be found in `coviddata` file
 
-When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas library. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. Also data must be prepared for SARIMAX model so exogenous variables must be in a Dataframe with the variables in the columns and the dates in the index.
+After exploration, next step is the cleaning and normalization part. For this, we have used pandas library. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. Also data must be prepared for SARIMAX model so exogenous variables must be in a Dataframe with the variables in the columns and the dates in the index.
 
 In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing values. The first idea was to create a predictive model for the flights (there is a `flightspred.ipynb` file in the old folder from github) but after analysing the influence of this variable in the model we realized that just making a constant line with last available value, the impact on the model was not big so that was the decision taken.
 

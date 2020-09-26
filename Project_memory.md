@@ -48,7 +48,7 @@ The normalization was done with minmaxscaler between 0 and 1
 ### Modeling
 Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:
 1. Train/test split: the `endogenous` and `exogenous` dataframes are split into train and test. We chose 85% of the data for the train size as data starts on Jan 1st 2020 and for the majority of the countries coronavirus cases start in March, and the deaths curve starts even later (meaning the first values of the series are all zero for many countries).
-2. Stationarity: one big drawback of ARIMA models is that the series to be forecasted (`endogenous`) needs to be stationary in order to get somewhat good predictions. The typical cases/deaths curve are not stationary at all, so needed to be transformed. After looking at various options, applying 1st order differencing or 2nd order differencing resulted in a stationary series. This was also confirmed by the auto-correlation function (ACF), partial auto-correlation function (PACF) plots and different statistical tests (kpss, adf, pp). For this reason, we 'fixed' the differencing term of ARIMA (d) to be 1 or 2.
+2. Stationarity: one big drawback of ARIMA models is that the series to be forecasted (`endogenous`) needs to be stationary in order to get somewhat good predictions. The typical cases/deaths curve are not stationary at all, so needed to be transformed. After looking at various options, applying 1st order differencing or 2nd order differencing resulted in a stationary series. This was also confirmed by the auto-correlation function (ACF), partial auto-correlation function (PACF) plots and different statistical tests (kpss, adf, pp). For this reason, we 'fixed' the differencing term of ARIMA (d) to be 1 or 2.  
 We created a function called `plot_acf_pacf()` (which can be found [here](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/datatools.py)) that helps to quickly visualize the ACF and PACF plots for the 1st order differencing and the 2nd order differencing. An example output for US new cases can be founde below:
 
 ![acf_pacf_ex](https://drive.google.com/file/d/1_FIsmxhSh9go3PcDC8gKWdeOGcBPoJ2N/view?usp=sharing)
@@ -92,6 +92,12 @@ Finally the only thing missing to run the files is to give them access to execut
 Everything is ready to deploy streamlit with the following line `nohup streamlit run streamcovapp.py`. nohup is needed as it tells the machine not to stop the streamlit when we close the terminal.
 
 ## Summary of main results
+
+The project has two main objectives: 1) was to try to predict new coronavirus cases/deaths and the 2) one was to deploy in a public url the work done, avoiding the need of installing anything on your laptop.
+1. Regarding the coronavirus forecasts, the results vary a lot depending on the country. In order to understand the country's results all together, in the script [Model_pipeline_all.py](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/Model_pipeline_all.py) we generate a csv [results.csv](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/results.csv) with the summarised results per country, which are: country, variable (new cases/new deaths), order of the model, MAE and MAE%. This csv helps to do a quick visual comparison of the each country's model performance.  
+In general, we can say that the forecast's MAE are relatively high resulting in poor forecasts, with some exceptions like US, Mexico, India, Indonesia, Japan, Finland or Philippines. Also we can see that the new cases forecasts tend to be better than the new deaths, which makes sense since the curve of new deaths starts later in time (less data from which to learn) and the numbers are low in many of the countries.  
+
+2. The second objective was deployed after testing many different options. Here we encountered two difficulties: we wanted the visualisation tool to be able to do live forecasts after user introduced changes in the exogenous variables. The other issue was to update on a daily basis the data in the background, so the forecasts remained always up to date. These difficulties were finally overcome, as explained in the previous section, and the app continues its daily updates in the background.  
 
 ## Conclusions
 

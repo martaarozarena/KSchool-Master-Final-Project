@@ -1,6 +1,7 @@
 # Project memory
 
-This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.
+This project predicts coronavirus cases and deaths in 25 selected countries around the world, for the next 2 weeks. In order to aim for better predictions, the model is trained with various exogenous variables. In the frontend, the user is then allowed to modify a couple of these exogenous variables in the future and see how those changes impact the forecast. The frontend visualisation tool is also deployed in Google Cloud, where daily scripts are run in order to retrieve the latest data and update the models with last observed date.  
+The detailed instructions to replicate the full project can be found in the [README.md](https://github.com/martaarozarena/KSchool-Master-Final-Project/blob/master/README.md).
 
 ## Introduction
 
@@ -27,6 +28,7 @@ The data downloaded is already in time series format, and is added to the `exoge
 
 
 ## Methodology
+
 ### Data cleaning
 When the raw data is found the next step is the cleaning and normalization part. For this, we have used pandas, scikit-learn, statmodels and pmdarima libraries. The first part consist of filter the data and take only the information of our 25 countries from 1st of january on. Then check there are no missing data and in case there are, find the way of filling the gaps. In our case, flights data is updated once a month so from the actualization date to the prediction date there are some missing values.
 
@@ -39,6 +41,11 @@ The 7 days rolling average was done in all the exogenous variables as well and t
 Once we have all the variables cleaned, by day and without NaNs,it is time to normalize them so the scale is the same for all the variables and there is not one with more impact on the model than the others due to high values (like flights in comparison with policy variables).
 
 The normalization has been done with minmaxscaler between 0 and 1
+
+### Modeling
+Once the data is cleaned and in the format needed for the SARIMAX model, we need to take a few more steps:
+1. Train/test split: the `endogenous` and `exogenous` dataframes are split into train and test. We chose 85% of the data for the train size as data starts on Jan 1st 2020 and for the majority of the countries coronavirus cases start in March, and the deaths curve starts even later (meaning the first values of the series are all zero for many countries).
+2. Stationarity: one big drawback of ARIMA models is that the series to be forecasted needs to be stationary in order to get somewhat good predictions. The typical cases/deaths curve are not stationary at all, so needed to be transformed. After looking at various options, applying 1st order differencing or 2dn order differencing resulted in stationary 
 
 ### Front end
 In order to deploy the front end we analyzed several options:

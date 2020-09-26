@@ -91,6 +91,17 @@ Finally the only thing missing to run the files is to give them access to execut
 
 Everything is ready to deploy streamlit with the following line `nohup streamlit run streamcovapp.py`. Nohup is needed as it tells the machine not to stop the streamlit when we close the terminal.
 
+## User manual front end
+### Public front end
+There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though [Live demo](http://34.78.90.249:8501)
+Once in the website there are two different parts on the app:
+  1. A sidebar on the left side where there are 5 values you can play with. The first option is to choose the country the user wants to make the forecast on, and the other 4 represent the exogenous values (on 2 exogenous variables: testing and contact tracing) we ask the user to modify to see how those changes impact the forecast.
+  2. The main central page is where we can see the forecast for the next 14 days, for both new cases and deaths. This forecast comes with 2 graphs showing in blue the data until 'yesterday' and in orange the predictions from 'today', for both new cases and deaths.
+  
+### Local front end
+When `endog_exog_series.py`and `model_pipeline_all.py` have been run in local, to run the streamlit app it is only needed to write in the terminal `streamlit run streamcovapp.py`.
+There rest is exactly the same than using the Public front end.
+
 ## Summary of main results
 
 The project had two main objectives: 1) was to try to predict new coronavirus cases/deaths and the 2) one was to deploy in a public url the work done, avoiding the need of installing anything on your laptop.
@@ -106,15 +117,3 @@ Our main conclusions of the project are:
 * Being two developing the project gaves us a range of opportunities: working in a more real setup where you need to collaborate and communicate effectively, and also allowing us to invest more time in specific topics of interest.
 * Balance between quality and cost is important. Time series analysis/forecasting with SARIMAX could be a very manual process since you need to look for stationarity in the data (plotting, statistical tests,...), you need to select the right (p,d,q) orders which change vastly the results, you need to check that the residuals of the fitted model are stationary... and in the end, the forecasts are not amazing. Bacause of this very time consuming process, we didn't have the time to inspect other time series forecasting approaches, such as linear models, LSTM or XGBoost.
 * We have tried to understand a real life problem in order to see how some decisions could affect the future number of cases/deaths in a way we haven't seen published before (at least when we started the project). Combining various data sources, at country level, which have a direct impact on the number of cases/deaths was the novelty. Also previous works were base on SIR models, but not SARIMAX.
-
-
-## User manual front end
-### Public front end
-There has been created a public website to see the streamlit app and play with it without the need of installing anything in the computer. The website is available though [Live demo](http://34.78.90.249:8501)
-Once in the website there are two different parts on the app:
-  1. A sidebar on the left side where there are 5 values you can play with. The first option is to choose the country the user wants to make the forecast on, and the other 4 represent the exogenous values (on 2 exogenous variables: testing and contact tracing) we ask the user to modify to see how those changes impact the forecast.
-  2. The main central page is where we can see the forecast for the next 14 days, for both new cases and deaths. This forecast comes with 2 graphs showing in blue the data until 'yesterday' and in orange the predictions from 'today', for both new cases and deaths.
-  
-### Local front end
-When `endog_exog_series.py`and `model_pipeline_all.py` have been run in local, to run the streamlit app it is only needed to write in the terminal `streamlit run streamcovapp.py`.
-There rest is exactly the same than using the Public front end.
